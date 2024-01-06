@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Bloip!</title>
+
+        <style>
+            #main-center-div {
+                text-align: center;
+            }
+            select {
+                width: 200px;
+                font-size: 1.5em;
+            }
+            label {
+                /*font-weight: bold;*/
+                font-size: 1.5em;
+            }
+            .text-input {
+                font-size: 2em;
+                width: 150px;
+                margin-bottom: 20px;
+            }
+
+            .range-container {
+                margin-top: 10px;
+                overflow: hidden;
+            }
+            .range-child {
+                float: left;
+                margin-right: 5px;
+            }
+            .range-float-container {
+                display: inline-block;
+            }
+            .range-text-input {
+                width: 150px;
+                font-size: 1.5em;
+                /*border-radius: 5px;*/
+            }
+
+            button {
+                font-size: 1.5em;
+            }
+        /* Switch -------------------*/
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 60px;
+                height: 34px;
+            }
+
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                -webkit-transition: .4s;
+                transition: .4s;
+            }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 26px;
+                width: 26px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                -webkit-transition: .4s;
+                transition: .4s;
+            }
+
+            input:checked + .slider {
+                background-color: #2196F3;
+            }
+
+            input:focus + .slider {
+                box-shadow: 0 0 1px #2196F3;
+            }
+
+            input:checked + .slider:before {
+                -webkit-transform: translateX(26px);
+                -ms-transform: translateX(26px);
+                transform: translateX(26px);
+            }
+
+            /* Rounded sliders */
+            .slider.round {
+                border-radius: 34px;
+            }
+
+            .slider.round:before {
+                border-radius: 50%;
+            }
+
+            #healthcare-excluded-label {
+                margin-left: 20px;
+            }
+            /* End switch -----------------------------*/
+
+        </style>
+    </head>
+    <body>
+        <div id="main-center-div">
+            <H1>Bloip!</H1>
+            <HR/>
+            <div>
+                <form>
+                    <!--<select name = "preset">
+                        <option value = "0">Medium Risk</option>
+                        <option value = "1">Low risk</option>
+                        <option value = "2">High Risk</option>
+                        <option value = "3">Custom</option>
+                    </select><BR/>
+                    <select name = "time_frame">
+                        <option value = "5">1 Week</option>
+                        <option value = "10">2  Weeks</option>
+                        <option value = "20">1 Month</option>
+                        <option value = "40">2 Months</option>
+                        <option value = "60">3 Months</option>
+                    </select><BR/>-->
+
+                    <BR/>
+                    <label for="max_increase">Daily Gains</label><BR/>
+                    <div class="range-container">
+                        <div class="range-float-container">
+                            <div class="range-child">
+                                <input id="max_increase" height = "150" name = "max_increase" type = "number" class="range-text-input" placeholder = "Max(%)"><BR/>
+                            </div>
+                            <div class="range-child">
+                                <input name = "max_decrease" height = "150" type = "number" class="range-text-input" placeholder = "Min(%)"><BR/>
+                            </div>
+                        </div>
+                    </div>
+                    <BR/>
+
+
+                    <!--<input id = "min_price" name = "min_price" type = "text" class="text-input" placeholder = "Minimum Price (dollars)"><BR/>
+                    <input name = "max_price"    type = "text" class="text-input" placeholder = "Maximum Price(Optional)"><BR/>-->
+
+                    <label for="min_price">Price Range</label><BR/>
+                    <div class="range-container">
+                        <div class="range-float-container">
+                            <div class="range-child">
+                                <input id = "min_price" name = "min_price" type = "number" class="range-text-input" placeholder = "Min($)"><BR/>
+                            </div>
+                            <div class="range-child">
+                                <input name = "max_price" type = "number" class="range-text-input" placeholder = "Max($)"><BR/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <BR/>
+                    <!--- Exclusions --->
+                    <label for = "profitability">Profitable Only</label>
+                    <label class="switch">
+                        <input id = "profitability" name = "profitability" value = "0" type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <!--<input name = "profitability"  type = "checkbox" id = "profitability" value = "0" checked>-->
+
+
+
+
+                    <!--<input name = "healthcare_excluded" type = "checkbox" id = "healthcare_excluded" value = "1" checked>-->
+                    <label id="healthcare-excluded-label" for = "healthcare_excluded">Healthcare</label>
+                    <label class="switch">
+                        <input id = "healthcare_excluded" name = "healthcare_excluded" value = "0" type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+
+                    <BR/>
+                    <BR/>
+
+                    <div>
+                        <button>Search</button>
+                    </div>
+
+                </form>
+            </div>
+            <HR/>
+        </div>
+    </body>
+</html>
