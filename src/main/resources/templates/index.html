@@ -1,47 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
+<html layout:decorate="~{layouts/main.html}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
     <head>
-        <meta charset="UTF-8">
-        <title>Bloip!</title>
-
         <style>
-            #main-center-div {
+            #slogan {
+                text-align: center;
+                padding-top: 0px;
+                padding-bottom: 15px;
+            }
+
+            #main-icon {
+                font-family: bloipFont;
                 text-align: center;
             }
-            select {
-                width: 200px;
-                font-size: 1.5em;
+
+            #main-center-div {
+                text-align: center;
+                font-family: bloipFont;
+                /*padding-left: 50px;
+                padding-right: 50px;*/
+                min-height: 900px;
             }
+
+            #profitability-switch {
+                margin-bottom: 5px;
+            }
+
+            .select-control {
+                text-align: center;
+                width: 320px;
+                font-size: 1.5em;
+                font-family: bloipFont;
+                margin-bottom: 10px;
+            }
+            .select-control-mobile {
+                text-align: center;
+                width: 100%;
+                font-size: 1.5em;
+                font-family: bloipFont;
+                margin-bottom: 10px;
+            }
+
             label {
-                /*font-weight: bold;*/
                 font-size: 1.5em;
             }
-            .text-input {
-                font-size: 2em;
-                width: 150px;
-                margin-bottom: 20px;
+
+            .input-control {
+                text-align: center;
+                width: 320px;
+                font-size: 1.5em;
+                font-family: bloipFont;
+            }
+            .input-control-mobile {
+                text-align: center;
+                font-size: 1.5em;
+                font-family: bloipFont;
+                width: 100%;
             }
 
-            .range-container {
-                margin-top: 10px;
-                overflow: hidden;
+            #search-button {
+                font-size: 1.5em;
+                font-family: bloipFont;
+                margin-top: 15px;
+                border-radius: 20px;
+                width: 250px;
+                height: 50px;
+                color: white;
+                background-color: black;
+                border: 0.5px solid black;
             }
-            .range-child {
-                float: left;
-                margin-right: 5px;
+            #search-button:hover {
+                cursor: pointer;
+
             }
-            .range-float-container {
+            .home-page-option {
+                text-align: center;
+                border: 0.5px solid gray;
+                border-radius: 5px;
+                /*width: 350px;*/
                 display: inline-block;
+                padding: 20px;
+                /*box-shadow: 2.5px 5px mediumpurple;*/
             }
-            .range-text-input {
-                width: 150px;
-                font-size: 1.5em;
-                /*border-radius: 5px;*/
+            .home-page-option-mobile {
+                text-align: center;
+                /*border: 0.5px solid gray;
+                border-radius: 5px;*/
+                display: inline-block;
+                padding: 20px;
+            }
+            #results-table {
+                display: inline-block;
+                /*min-width: 1000px;
+                border: 1px solid green;*/
+            }
+            #results-table tr {
+                /*width: 1500px;
+                border: 1px solid red;*/
+            }
+            #results-table th {
+                padding: 15px;
+            }
+            #results-table td {
+                padding: 15px;
+                width: 185px;
+            }
+            #results-table tr:nth-child(even){background-color: mediumpurple;}
+            #results-table-header {
+                background-color: purple;
+                color: white;
             }
 
-            button {
-                font-size: 1.5em;
+            .results-table-mobile {
+                width: 100%;
+                padding-left: 10px;
+                padding-right: 10px;
             }
+
+            #pagination-buttons {
+                margin-top: 40px;
+            }
+
+            .mobile-rule {
+                border-color: purple;
+            }
+
         /* Switch -------------------*/
             .switch {
                 position: relative;
@@ -81,11 +163,13 @@
             }
 
             input:checked + .slider {
-                background-color: #2196F3;
+                /*background-color: #2196F3;*/
+                background-color: purple;
             }
 
             input:focus + .slider {
-                box-shadow: 0 0 1px #2196F3;
+                /*box-shadow: 0 0 1px #2196F3;*/
+                box-shadow: 0 0 1px purple;
             }
 
             input:checked + .slider:before {
@@ -102,93 +186,112 @@
             .slider.round:before {
                 border-radius: 50%;
             }
-
-            #healthcare-excluded-label {
-                margin-left: 20px;
-            }
             /* End switch -----------------------------*/
 
         </style>
+        <script type="text/javascript">
+            function init() {
+
+            }
+        </script>
     </head>
-    <body>
-        <div id="main-center-div">
-            <H1>Bloip!</H1>
-            <HR/>
-            <div>
-                <form>
-                    <!--<select name = "preset">
-                        <option value = "0">Medium Risk</option>
-                        <option value = "1">Low risk</option>
-                        <option value = "2">High Risk</option>
-                        <option value = "3">Custom</option>
-                    </select><BR/>
-                    <select name = "time_frame">
-                        <option value = "5">1 Week</option>
-                        <option value = "10">2  Weeks</option>
-                        <option value = "20">1 Month</option>
-                        <option value = "40">2 Months</option>
-                        <option value = "60">3 Months</option>
-                    </select><BR/>-->
+    <body onload="init();">
+        <th:block layout:fragment="content">
+            <div id="slogan">
+                <H1 id="main-icon">Sort the stock market!</H1>
+            </div>
+            <div id="main-center-div">
+                    <form action="/" method = "POST">
+                        <div th:class =" ${isNotMobile} ? 'home-page-option' : 'home-page-option-mobile'">
+                            <div id="profitability-switch" class="form-group">
+                                <label for = "profitability">Profitable Only</label>
+                                <label class="switch">
+                                    <input id = "profitability" name = "profitability" value = "0" type="checkbox">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
 
-                    <BR/>
-                    <label for="max_increase">Daily Gains</label><BR/>
-                    <div class="range-container">
-                        <div class="range-float-container">
-                            <div class="range-child">
-                                <input id="max_increase" height = "150" name = "max_increase" type = "number" class="range-text-input" placeholder = "Max(%)"><BR/>
+                            <div class="form-group">
+                                <select id="time_frame" name = "time_frame" th:class ="${isNotMobile} ? 'form-select select-control' : 'form-select select-control-mobile'" stylen="font-size: 1.5em; width: 320px;">
+                                    <option value = "5">1 Week</option>
+                                    <option value = "10">2  Weeks</option>
+                                    <option value = "20">1 Month</option>
+                                    <option value = "40">2 Months</option>
+                                    <option value = "60">3 Months</option>
+                                </select>
                             </div>
-                            <div class="range-child">
-                                <input name = "max_decrease" height = "150" type = "number" class="range-text-input" placeholder = "Min(%)"><BR/>
+                            <div id="volatility-form-group" class="form-group">
+                                <select id="volatility_limit" name = "volatility_limit" th:class ="${isNotMobile} ? 'form-select select-control' : 'form-select select-control-mobile'" stylen="font-size: 1.5em; width: 320px;">
+                                    <option value = "5">(+/-) 5%</option>
+                                    <option value = "10">(+/-) 10%</option>
+                                    <option value = "15">(+/-) 15%</option>
+                                    <option value = "20">(+/-) 20%</option>
+                                    <option value = "25">(+/-) 25%</option>
+                                    <option value = "30">(+/-) 30%</option>
+                                    <option value = "100">(+/-) 100%</option>
+                                </select>
                             </div>
+                            <div class="form-group">
+                                <input id="ticker-input" name="ticker" type="text"  th:class="${isNotMobile} ? 'form-control input-control': 'form-control input-control-mobile'" placeholder="Enter Symbol (Optional)" stylen="font-size: 1.5em;">
+                            </div>
+
                         </div>
-                    </div>
-                    <BR/>
 
-
-                    <!--<input id = "min_price" name = "min_price" type = "text" class="text-input" placeholder = "Minimum Price (dollars)"><BR/>
-                    <input name = "max_price"    type = "text" class="text-input" placeholder = "Maximum Price(Optional)"><BR/>-->
-
-                    <label for="min_price">Price Range</label><BR/>
-                    <div class="range-container">
-                        <div class="range-float-container">
-                            <div class="range-child">
-                                <input id = "min_price" name = "min_price" type = "number" class="range-text-input" placeholder = "Min($)"><BR/>
-                            </div>
-                            <div class="range-child">
-                                <input name = "max_price" type = "number" class="range-text-input" placeholder = "Max($)"><BR/>
-                            </div>
+                        <div>
+                            <button id="search-button">Search</button>
                         </div>
-                    </div>
 
-                    <BR/>
-                    <!--- Exclusions --->
-                    <label for = "profitability">Profitable Only</label>
-                    <label class="switch">
-                        <input id = "profitability" name = "profitability" value = "0" type="checkbox">
-                        <span class="slider round"></span>
-                    </label>
-                    <!--<input name = "profitability"  type = "checkbox" id = "profitability" value = "0" checked>-->
-
-
-
-
-                    <!--<input name = "healthcare_excluded" type = "checkbox" id = "healthcare_excluded" value = "1" checked>-->
-                    <label id="healthcare-excluded-label" for = "healthcare_excluded">Healthcare</label>
-                    <label class="switch">
-                        <input id = "healthcare_excluded" name = "healthcare_excluded" value = "0" type="checkbox">
-                        <span class="slider round"></span>
-                    </label>
-
-                    <BR/>
+                    </form>
+                    <!--</div> -->
                     <BR/>
 
                     <div>
-                        <button>Search</button>
+                        <table id="results-table" th:if="${isNotMobile}">
+                            <thead>
+                                <tr id="results-table-header">
+                                    <th>Ticker</th>
+                                    <th>Total Gain(%)</th>
+                                    <th>Worst Day(-%)</th>
+                                    <th>Best Day(+%)</th>
+                                    <th>Profit Margin(%)</th>
+                                    <th>Debt(%)</th>
+                                    <th>Cash burn(%)</th>
+                                </tr>
+                            </thead>
+                            <tr th:each="s: ${stocks}">
+                                <td th:text="${s.ticker}" />
+                                <td th:text="${s.windowDelta}" />
+                                <td th:text="${s.minDelta}" />
+                                <td th:text="${s.maxDelta}" />
+                                <td th:text="${s.profitMargin}" />
+                                <td th:text="${s.debtRatio}" />
+                                <td th:text="${s.cashBurnRate}" />
+                            </tr>
+                        </table>
+                        <div th:unless="${isNotMobile}">
+                            <HR class="mobile-rule"/>
+                            <div th:each="s: ${stocks}">
+                                <table class="results-table-mobile">
+                                    <tr><td>Ticker</td><td th:text="${s.ticker}" /></tr>
+                                    <tr><td>Total Gain(%)</td><td th:text="${s.windowDelta}" /></tr>
+                                    <tr><td>Worst Day(-%)</td><td th:text="${s.minDelta}" /></tr>
+                                    <tr><td>Best Day(+%)</td><td th:text="${s.maxDelta}" /></tr>
+                                    <tr><td>Profit Margin(%)</td><td th:text="${s.profitMargin}" /></tr>
+                                    <tr><td>Debt(%)</td><td th:text="${s.debtRatio}" /></tr>
+                                    <tr><td>Cash burn(%)</td><td th:text="${s.cashBurnRate}" /></tr>
+                                </table>
+                                <BR/>
+                                <HR class="mobile-rule"/>
+                            </div>
+                        </div>
                     </div>
 
-                </form>
-            </div>
-            <HR/>
-        </div>
+                    <div id="pagination-buttons">
+                        <button> < </button><button> > </button>
+                    </div>
+
+                </div>
+        </th:block>
+
     </body>
 </html>
