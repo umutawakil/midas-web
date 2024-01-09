@@ -121,7 +121,7 @@
 
             <main>
                 <!--The meat and potatoes of the layout. Put what you wish to override for each page below-->
-                <div id="layout-center">
+                <div id="layout-center" th:style="${isNotMobile} ? 'padding-left: 40px; padding-right: 40px;' : ''">
                     <th:block layout:fragment="content">
                         <!--Move each pages contents here in individual templates-->
                     </th:block>
@@ -140,7 +140,7 @@
                 <div id="newsletter-container" th:if="${isNotMobile}">
                     <form id="news-letter-form" method="post" action="/newsletter">
                         <div class="form-group">
-                            <input class="form-control" style="font-size: 1em;" name ="email" type="email" placeholder="Example@bloip.com">
+                            <input class="form-control" style="text-align: center; font-size: 1em;" name ="email" type="email" placeholder="Example@bloip.com">
                         </div>
                         <div>
                             <button class="action-button">Subscribe</button>
@@ -150,7 +150,7 @@
                 <div id="newsletter-container-mobile" th:unless="${isNotMobile}">
                     <form id="news-letter-form" method="post" action="/newsletter">
                         <div class="form-group">
-                            <input class="form-control" style="font-size: 1em;" name ="email" type="email" placeholder="Example@bloip.com">
+                            <input class="form-control" style="text-align: center; font-size: 1em;" name ="email" type="email" placeholder="Example@bloip.com">
                         </div>
                         <div>
                             <button class="action-button">Subscribe</button>
