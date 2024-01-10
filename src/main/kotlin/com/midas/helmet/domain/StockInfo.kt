@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.io.Serializable
 import java.util.*
-import kotlin.Comparator
 import kotlin.collections.HashMap
-import kotlin.math.abs
 
 @Entity
 @Table(name="v_stock_info")
@@ -29,8 +27,8 @@ class StockInfo {
     private val minDelta: Double
     private val maxDelta: Double
     private val profitMargin: Double?
-    @Column(name = "current_asset_liability")
-    private val debtRatio: Double?
+    @Column(name = "debt_percentage")
+    private val debtPercentage: Double?
     @Column(name = "cfo_working_capital")
     private val cashBurnRate: Double?
     //private val timeWindow: Int
@@ -43,7 +41,11 @@ class StockInfo {
         val maxDelta: Double,
         val profitMargin: Double?,
         val debtRatio: Double?,
-        val cashBurnRate: Double?
+        val flagDebtRatio: Boolean,
+        val cashBurnRate: Double?,
+        val cashBurnRateMag: Double?,
+        val showBurnRate: Boolean,
+        val flagBurnRate: Boolean
     )
 
     constructor(
@@ -63,7 +65,7 @@ class StockInfo {
         this.minDelta     = minDelta
         this.maxDelta     = maxDelta
         this.profitMargin = profitMargin
-        this.debtRatio    = debtRatio
+        this.debtPercentage    = debtRatio
         this.cashBurnRate = cashBurnRate
         //this.timeWindow   = timeWindow
         this.id           = StockInfoId(ticker = ticker, timeWindow = timeWindow)
@@ -82,9 +84,9 @@ class StockInfo {
             println("Loading stock info for ${results.size}")
             for(r in results) {
                 /** Populate the map for querying individual tickers **/
-                val stockByWindow = stocksByTicker[r.id.ticker] ?: HashMap()
+                val stockByWindow = stocksByTicker[r.id.ticker.lowercase()] ?: HashMap()
                 stockByWindow[r.id.timeWindow] = r
-                stocksByTicker[r.id.ticker] = stockByWindow
+                stocksByTicker[r.id.ticker.lowercase()] = stockByWindow
 
                 /** Populate the maps for browsing profitable stocks as well as profitable + unprofitable **/
                 if((r.profitMargin != null) && r.profitMargin > 0) {
@@ -132,8 +134,17 @@ class StockInfo {
             )
         }
 
-        fun getStockInfo(ticker: String) : Map<Int, StockInfo>? {
-            return stocksByTicker[ticker]
+        private fun getStockInfo(ticker: String, timeWindow: Int) : StockInfo? {
+            return stocksByTicker[ticker.lowercase()]?.get(timeWindow)
+        }
+
+        private fun filterStandardQuery(timeWindow: Int,
+                                        set: Set<StockInfo>,
+                                        min: Double,
+                                        max: Double) : List<StockInfo> {
+            return set.filter {
+                it.id.timeWindow == timeWindow && it.maxDelta <= max && it.minDelta >= min
+            }.sortedByDescending { it.windowDelta }
         }
 
         private fun query(
@@ -144,9 +155,12 @@ class StockInfo {
                 min: Double,
                 max: Double
         ) : List<StockInfoDto> {
-            val results: List<StockInfo> = set.filter {
-                it.id.timeWindow == timeWindow && it.maxDelta <= max && it.minDelta >= min
-            }.sortedByDescending { it.windowDelta }
+            val results: List<StockInfo> = filterStandardQuery(
+                timeWindow = timeWindow,
+                min = min,
+                max = max,
+                set = set
+            )
 
             var endIndex = start + size
             if(endIndex >= results.size) {
@@ -160,10 +174,41 @@ class StockInfo {
                     minDelta     = x.minDelta,
                     maxDelta     = x.maxDelta,
                     profitMargin = x.profitMargin,
-                    debtRatio    = x.debtRatio,
-                    cashBurnRate = x.cashBurnRate
+                    debtRatio    = x.debtPercentage,
+                    flagDebtRatio = if(x.debtPercentage != null && x.debtPercentage > 50.0) { true } else { false },
+                    cashBurnRate = x.cashBurnRate,
+                    cashBurnRateMag = if( x.cashBurnRate != null && x.cashBurnRate <0) { Math.abs(x.cashBurnRate) } else { null },
+                    showBurnRate = if(x.cashBurnRate != null && x.cashBurnRate < 0) { true } else { false },
+                    flagBurnRate = if(x.cashBurnRate != null && x.cashBurnRate < -100) { true } else { false }
                )
             }
+        }
+
+        fun queryTicker(
+            ticker: String,
+            timeWindow: Int
+        ) : List<StockInfoDto> {
+            val resultList: MutableList<StockInfoDto> = mutableListOf()
+            val x: StockInfo = getStockInfo(ticker = ticker, timeWindow = timeWindow) ?: return emptyList()
+
+             resultList.add(
+                StockInfoDto(
+                    ticker       = x.id.ticker,
+                    name         = x.name,
+                    windowDelta  = x.windowDelta,
+                    minDelta     = x.minDelta,
+                    maxDelta     = x.maxDelta,
+                    profitMargin = x.profitMargin,
+                    debtRatio    = x.debtPercentage,
+                    //cashBurnRate = x.cashBurnRate
+                            flagDebtRatio = if(x.debtPercentage != null && x.debtPercentage > 50.0) { true } else { false },
+                    cashBurnRate = x.cashBurnRate,
+                    cashBurnRateMag = if( x.cashBurnRate != null && x.cashBurnRate <0) { Math.abs(x.cashBurnRate) } else { null },
+                    showBurnRate = if(x.cashBurnRate != null && x.cashBurnRate < 0) { true } else { false },
+                    flagBurnRate = if(x.cashBurnRate != null && x.cashBurnRate < -100) { true } else { false }
+                )
+            )
+            return resultList
         }
     }
 }

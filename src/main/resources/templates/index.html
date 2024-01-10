@@ -104,7 +104,7 @@
                 padding: 15px;
                 width: 185px;
             }
-            #results-table tr:nth-child(even){background-color: mediumpurple;}
+            #results-table tr:nth-child(even){background-color: #f3ccff;}
             #results-table-header {
                 background-color: purple;
                 color: white;
@@ -225,11 +225,11 @@
 
                             <div class="form-group">
                                 <select id="time_window" name = "time_window" th:class ="${isNotMobile} ? 'form-select select-control' : 'form-select select-control-mobile'" stylen="font-size: 1.5em; width: 320px;">
-                                    <option value = "5">1 Week</option>
-                                    <option value = "10">2  Weeks</option>
-                                    <option value = "20">1 Month</option>
-                                    <option value = "40">2 Months</option>
-                                    <option value = "60">3 Months</option>
+                                    <option value = "5">Past Week</option>
+                                    <option value = "10">Past 2 Weeks</option>
+                                    <option value = "20">Past Month</option>
+                                    <option value = "40">Past 2 Months</option>
+                                    <option value = "60">Past 3 Months</option>
                                 </select>
                             </div>
                             <div id="volatility-form-group" class="form-group">
@@ -240,11 +240,11 @@
                                     <option value = "20">(+/-) 20%</option>
                                     <option value = "25">(+/-) 25%</option>
                                     <option value = "30">(+/-) 30%</option>
-                                    <option value = "100">(+/-) 100%</option>
+                                    <option value = "1000">(+/-) 100%</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <input id="ticker-input" name="ticker" type="text"  th:class="${isNotMobile} ? 'form-control input-control': 'form-control input-control-mobile'" placeholder="Enter Symbol (Optional)" stylen="font-size: 1.5em;">
+                                <input th:value="${ticker}" id="ticker-input" name="ticker" type="text"  th:class="${isNotMobile} ? 'form-control input-control': 'form-control input-control-mobile'" placeholder="Enter Symbol (Optional)" stylen="font-size: 1.5em;">
                             </div>
 
                         </div>
@@ -267,7 +267,7 @@
                                     <th>Best Day(+%)</th>
                                     <th>Profit Margin(%)</th>
                                     <th>Debt(%)</th>
-                                    <th>Cash burn(%)</th>
+                                    <th>Projected Cash burn(%)</th>
                                 </tr>
                             </thead>
                             <tr th:each="s: ${stocks}">
@@ -276,8 +276,8 @@
                                 <td th:text="${s.minDelta}" />
                                 <td th:text="${s.maxDelta}" />
                                 <td th:text="${s.profitMargin}" />
-                                <td th:text="${s.debtRatio}" />
-                                <td th:text="${s.cashBurnRate}" />
+                                <td th:text="${s.debtRatio}" th:style="${s.flagDebtRatio} ?'color: red; font-weight: bolder;' : ''" />
+                                <td th:text="(${s.cashBurnRate} == null OR ${s.cashBurnRate} > 0) ? '': ${s.cashBurnRateMag}" th:style="${s.flagBurnRate} ?'color: red; font-weight: bolder;' : ''"/>
                             </tr>
                         </table>
                         <div th:unless="${isNotMobile}">
