@@ -191,7 +191,18 @@
         </style>
         <script type="text/javascript">
             function init() {
+                var stash           = document.getElementById("stash");
+                var profitability   = stash.getAttribute("profitability");
+                var timeWindow      = stash.getAttribute("timeWindow");
+                var volatilityLimit = stash.getAttribute("volatilityLimit");
 
+                if(profitability === "true") {
+                    document.getElementById("profitability").checked = "checked";
+                }
+                document.getElementById("time_window").value = timeWindow
+                document.getElementById("volatility_limit").value = volatilityLimit
+
+                console.log("P: " + profitability +", timeWindow: " + timeWindow +", volatilityLimit: " + volatilityLimit);
             }
         </script>
     </head>
@@ -200,19 +211,20 @@
             <div id="slogan">
                 <H1 id="main-icon">Sort the stock market!</H1>
             </div>
+            <span id="stash" style="display: none" th:attr="timeWindow=${timeWindow},profitability=${profitability}, volatilityLimit=${volatilityLimit}"></span>
             <div id="main-center-div">
-                    <form action="/" method = "POST">
+                    <form action="/" method = "GET">
                         <div th:class =" ${isNotMobile} ? 'home-page-option' : 'home-page-option-mobile'">
                             <div id="profitability-switch" class="form-group">
                                 <label for = "profitability">Profitable Only</label>
                                 <label class="switch">
-                                    <input id = "profitability" name = "profitability" value = "0" type="checkbox">
+                                    <input id = "profitability" name = "profitability" value = "1" type="checkbox">
                                     <span class="slider round"></span>
                                 </label>
                             </div>
 
                             <div class="form-group">
-                                <select id="time_frame" name = "time_frame" th:class ="${isNotMobile} ? 'form-select select-control' : 'form-select select-control-mobile'" stylen="font-size: 1.5em; width: 320px;">
+                                <select id="time_window" name = "time_window" th:class ="${isNotMobile} ? 'form-select select-control' : 'form-select select-control-mobile'" stylen="font-size: 1.5em; width: 320px;">
                                     <option value = "5">1 Week</option>
                                     <option value = "10">2  Weeks</option>
                                     <option value = "20">1 Month</option>
@@ -242,7 +254,7 @@
                         </div>
 
                     </form>
-                    <!--</div> -->
+
                     <BR/>
 
                     <div>
@@ -287,7 +299,20 @@
                     </div>
 
                     <div id="pagination-buttons">
-                        <button> < </button><button> > </button>
+                        <form th:if="${back != null}" action="/" method = "GET" style="display: inline-block;">
+                            <input type="hidden" name="start" th:value="${back}">
+                            <input type="hidden" name="time_window" th:value="${timeWindow}">
+                            <input type="hidden" name="volatility_limit" th:value="${volatilityLimit}">
+                            <input type="hidden" name="profitability" th:value="${profitability}">
+                            <button> < </button>
+                        </form>
+                        <form th:if="${next != null}" action="/" method = "GET" style="display: inline-block;">
+                            <input type="hidden" name="start" th:value="${next}">
+                            <input type="hidden" name="time_window" th:value="${timeWindow}">
+                            <input type="hidden" name="volatility_limit" th:value="${volatilityLimit}">
+                            <input type="hidden" name="profitability" th:value="${profitability}">
+                            <button> > </button>
+                        </form>
                     </div>
 
                 </div>

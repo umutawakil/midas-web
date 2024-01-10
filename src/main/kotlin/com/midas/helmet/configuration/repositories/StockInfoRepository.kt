@@ -4,5 +4,5 @@ import com.midas.helmet.domain.StockInfo
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface StockInfoRepository : PagingAndSortingRepository<StockInfo, Long> {
+interface StockInfoRepository : CrudRepository<StockInfo, Long> {
 }
