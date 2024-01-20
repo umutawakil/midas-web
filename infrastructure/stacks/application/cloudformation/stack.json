@@ -305,7 +305,7 @@
                   "OriginRequestPolicyId": {"Ref": "ProxyCdnOriginRequestPolicy"},
                   "AllowedMethods": ["HEAD", "DELETE", "POST", "GET", "OPTIONS", "PUT", "PATCH"],
                   "TargetOriginId" : {"Ref":"ElasticLoadBalancer"},
-                  "ViewerProtocolPolicy" : "allow-all"
+                  "ViewerProtocolPolicy" : "redirect-to-https"
               },
               "Enabled" : "true",
               "Origins" : [
