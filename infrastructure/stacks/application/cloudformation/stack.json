@@ -340,7 +340,7 @@
         }
       }
     },
-    "ProxyDnsRecord": {
+    "PrimaryProxyDnsRecord": {
       "Type": "AWS::Route53::RecordSet",
       "DependsOn": ["ProxyCdn"],
       "Properties": {
@@ -354,9 +354,9 @@
         }
       }
     },
-    "ProxyDnsRecordWww": {
+    "SecondaryProxyDnsRecord": {
       "Type": "AWS::Route53::RecordSet",
-      "DependsOn": ["ProxyDnsRecord"],
+      "DependsOn": ["PrimaryProxyDnsRecord"],
       "Properties": {
         "HostedZoneName": {"Fn::Join": ["",[{"Ref": "HostedZone"},"."]]},
         "Comment": "WWW Domain name ",

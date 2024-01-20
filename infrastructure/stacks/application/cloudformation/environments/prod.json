@@ -13,7 +13,7 @@
   },
   {
     "ParameterKey": "SSLCertificateARN",
-    "ParameterValue": "arn:aws:acm:us-east-1:298959928212:certificate/7470b839-ec90-4a51-86ea-e168deb46e71"
+    "ParameterValue": "arn:aws:acm:us-east-1:298959928212:certificate/e2595282-7e04-42c1-8cbd-aab95e2c30b2"
   },
   {
     "ParameterKey": "HostedZone",
