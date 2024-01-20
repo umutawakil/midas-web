@@ -1,0 +1,93 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "Environment": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "User" : {
+      "Description": "IAM user whose keys will be used for this project",
+      "Type" : "AWS::IAM::User",
+      "Properties" : {}
+    },
+    "UserCredentials" :{
+      "DependsOn": ["User"],
+      "Type" : "AWS::IAM::AccessKey",
+      "Properties" : {
+        "UserName" : {"Ref" : "User"}
+      }
+    },
+    "EmailSendPolicy": {
+      "DependsOn" : ["User"],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": {"Fn::Join": ["",["Email-send-policy-",{"Ref": "Environment"}]]},
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ses:SendEmail",
+                "ses:SendRawEmail"
+              ],
+              "Resource": "*"
+            }
+          ]
+        },
+        "Users": [
+          {
+            "Ref": "User"
+          }
+        ]
+      }
+    },
+    "EmailQueue" : {
+      "Type" : "AWS::SQS::Queue",
+      "Properties" : {
+        "ReceiveMessageWaitTimeSeconds" : "20",
+        "FifoQueue" : "true",
+        "ContentBasedDeduplication" : "true"
+      }
+    },
+    "EmailQueuePolicy" : {
+      "Type" : "AWS::SQS::QueuePolicy",
+      "Properties" : {
+        "Queues" :  [{"Ref": "EmailQueue"}],
+        "PolicyDocument": {
+          "Statement":[{
+            "Action": ["SQS:SendMessage","SQS:ReceiveMessage","SQS:DeleteMessage"],
+            "Effect":"Allow",
+            "Resource": {"Fn::GetAtt": ["EmailQueue", "Arn"]},
+            "Principal": {
+              "AWS": {"Fn::GetAtt": ["User", "Arn"]}
+            }
+          }]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "Username" : {
+      "Description" : "Username of the upload user",
+      "Value" : {"Ref":  "User"}
+    },
+    "UserArn" : {
+      "Description" : "ARN for the upload user",
+      "Value" :  {"Fn::GetAtt": ["User", "Arn"]}
+    },
+    "UserAccessKey" : {
+      "Description" : "The public facing part of the upload users credential",
+      "Value" : {"Ref":"UserCredentials"}
+    },
+    "UserSecretKey" : {
+      "Description" : "The private/secret part of the upload users credential",
+      "Value" :  {"Fn::GetAtt": ["UserCredentials", "SecretAccessKey"]}
+    },
+    "EmailQueueURL": {
+      "Description": "URL of the email queue",
+      "Value": {"Ref": "EmailQueue"}
+    }
+  }
+}

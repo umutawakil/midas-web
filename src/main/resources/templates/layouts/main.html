@@ -90,21 +90,49 @@
                 text-align: center;
                 font-size: 1.25em;
                 font-family: bloipFont;
-                margin-bottom: 25px;
+                margin-bottom: 75px;
             }
 
             #footer-links-container {
                 margin-top: 30px;
             }
             #footer-links-container div {
-                margin-bottom: 5px;
+                margin-bottom: 0px;
             }
             .footer-links {
                 text-decoration: none;
                 color: black;
             }
 
+            #confirmation-email-dialog {
+                display: none;
+                border: 1px solid green;
+                background-color: lightgreen;
+                color: green;
+                padding: 30px;
+            }
+
         </style>
+        <script type = "text/javascript">
+            document.addEventListener("DOMContentLoaded", function() {
+
+                document.getElementById("newsletter-form").addEventListener("submit", function(event) {
+                    event.preventDefault()
+
+                    const form = new FormData(document.getElementById("newsletter-form"));
+                    form.set("time_zone_offset", ("" + new Date().getTimezoneOffset()));
+                    fetch("/newsletter", {
+                        method: "POST",
+                        body: form,
+                    });
+                    //alert("Thanks! Check your inbox for a confirmation email.");
+                    document.getElementById("newsletter-form").style.display="none";
+                    document.getElementById("confirmation-email-dialog").style.display="block";
+
+                });
+
+            });
+        </script>
     </head>
     <body>
         <div id="center-wrap">
@@ -138,31 +166,49 @@
                 <BR/>
 
                 <div id="newsletter-container" th:if="${isNotMobile}">
-                    <form id="news-letter-form" method="post" action="/newsletter">
+                    <div id="confirmation-email-dialog">
+                        Confirmation email sent
+                    </div>
+                    <form id="newsletter-form">
                         <div class="form-group">
-                            <input class="form-control" style="text-align: center; font-size: 1em;" name ="email" type="email" placeholder="Example@bloip.com">
+                            <input class="form-control" style="text-align: center; font-size: 1em;" name ="email" type="email" placeholder="Enter your email" required>
                         </div>
                         <div>
-                            <button class="action-button">Subscribe</button>
+                            <button id="newsletter-submit-button" class="action-button">Subscribe</button>
                         </div>
                     </form>
                 </div>
                 <div id="newsletter-container-mobile" th:unless="${isNotMobile}">
-                    <form id="news-letter-form" method="post" action="/newsletter">
+                    <div id="confirmation-email-dialog">
+                        Confirmation email sent
+                    </div>
+                    <form id="newsletter-form">
                         <div class="form-group">
-                            <input class="form-control" style="text-align: center; font-size: 1em;" name ="email" type="email" placeholder="Example@bloip.com">
+                            <input class="form-control" style="text-align: center; font-size: 1em;" name ="email" type="email" placeholder="Enter your email" required>
                         </div>
                         <div>
-                            <button class="action-button">Subscribe</button>
+                            <button id="newsletter-submit-button" class="action-button">Subscribe</button>
                         </div>
                     </form>
                 </div>
 
                 <BR/>
+                <BR/>
 
                 <div id="footer-links-container">
-                    <div><a class="footer-links" href="/youtube-channel">Youtube</a></div>
-                    <div><a class="footer-links" href="https://twitter.com/BloipApp">Twitter</a></div>
+                    <div>
+                        <a class="footer-links" href="https://www.youtube.com/@bloipapp">
+                            <p>Join the Youtube channel</p>
+                            <img src="/images/youtube.png">
+                        </a>
+                    </div>
+                    <div id="twitter-container" style="margin-top: 30px;">
+
+                        <a class="footer-links" href="https://twitter.com/BloipApp">
+                            <p>Follow on Twitter</p>
+                            <img src="/images/twitter.png">
+                        </a>
+                    </div>
                 </div>
             </footer>
         </div>

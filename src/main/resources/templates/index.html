@@ -124,6 +124,13 @@
                 border-color: purple;
             }
 
+            #unsupported-container {
+                padding-left: 150px;
+                padding-right: 150px;
+                margin-top: 20px;
+                font-size: 1.5em;
+            }
+
         /* Switch -------------------*/
             .switch {
                 position: relative;
@@ -131,13 +138,11 @@
                 width: 60px;
                 height: 34px;
             }
-
             .switch input {
                 opacity: 0;
                 width: 0;
                 height: 0;
             }
-
             .slider {
                 position: absolute;
                 cursor: pointer;
@@ -149,7 +154,6 @@
                 -webkit-transition: .4s;
                 transition: .4s;
             }
-
             .slider:before {
                 position: absolute;
                 content: "";
@@ -161,28 +165,22 @@
                 -webkit-transition: .4s;
                 transition: .4s;
             }
-
             input:checked + .slider {
                 /*background-color: #2196F3;*/
                 background-color: purple;
             }
-
             input:focus + .slider {
                 /*box-shadow: 0 0 1px #2196F3;*/
                 box-shadow: 0 0 1px purple;
             }
-
             input:checked + .slider:before {
                 -webkit-transform: translateX(26px);
                 -ms-transform: translateX(26px);
                 transform: translateX(26px);
             }
-
-            /* Rounded sliders */
             .slider.round {
                 border-radius: 34px;
             }
-
             .slider.round:before {
                 border-radius: 50%;
             }
@@ -192,15 +190,26 @@
         <script type="text/javascript">
             function init() {
                 var stash           = document.getElementById("stash");
+                var ticker          = stash.getAttribute("ticker");
                 var profitability   = stash.getAttribute("profitability");
                 var timeWindow      = stash.getAttribute("timeWindow");
                 var volatilityLimit = stash.getAttribute("volatilityLimit");
+                var orderDescending = stash.getAttribute("orderDescending");
 
-                if(profitability === "true") {
+                /*if(profitability === "true") {
                     document.getElementById("profitability").checked = "checked";
+                }*/
+                document.getElementById("profitability").value    = profitability;
+                document.getElementById("time_window").value      = timeWindow;
+                document.getElementById("volatility_limit").value = volatilityLimit;
+                document.getElementById("order_descending").value = orderDescending;
+
+                if (document.getElementById("unsupported-container")) {
+                    alert("Sorry! That stock is currently not providing us with standard US accounting information and is most likely a foreign company. We are working on integrating them. Please shoot us a message on Twitter telling us to hurry up!!!");
                 }
-                document.getElementById("time_window").value = timeWindow
-                document.getElementById("volatility_limit").value = volatilityLimit
+                if (document.getElementById("notFound")) {
+                    alert("No stock with that symbol can be found. Type the stock ticker or symbol (not the company name). Check your spelling. Send us a message on Twitter if you are sure you spelt the ticker correctly.")
+                }
 
                 console.log("P: " + profitability +", timeWindow: " + timeWindow +", volatilityLimit: " + volatilityLimit);
             }
@@ -211,16 +220,29 @@
             <div id="slogan">
                 <H1 id="main-icon">Sort the stock market!</H1>
             </div>
-            <span id="stash" style="display: none" th:attr="timeWindow=${timeWindow},profitability=${profitability}, volatilityLimit=${volatilityLimit}"></span>
+            <span id="stash" style="display: none" th:attr="ticker=${ticker},timeWindow=${timeWindow},profitability=${profitability}, volatilityLimit=${volatilityLimit}, orderDescending=${orderDescending}"></span>
             <div id="main-center-div">
                     <form action="/" method = "GET">
                         <div th:class =" ${isNotMobile} ? 'home-page-option' : 'home-page-option-mobile'">
-                            <div id="profitability-switch" class="form-group">
+                            <!--<div id="profitability-switch" class="form-group">
                                 <label for = "profitability">Profitable Only</label>
                                 <label class="switch">
                                     <input id = "profitability" name = "profitability" value = "1" type="checkbox">
                                     <span class="slider round"></span>
                                 </label>
+                            </div>-->
+                            <div class="form-group">
+                                <select id="profitability" name="profitability" th:class ="${isNotMobile} ? 'form-select select-control' : 'form-select select-control-mobile'" stylen="font-size: 1.5em; width: 320px;">
+                                    <option value = "0">All Stocks</option>
+                                    <option value = "1">Profitable Only</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <select id="order_descending" name = "order_descending" th:class ="${orderDescending} ? 'form-select select-control' : 'form-select select-control-mobile'" stylen="font-size: 1.5em; width: 320px;">
+                                    <option value = "1">Increasing first (Bulls)</option>
+                                    <option value = "0">Decreasing first (Bears)</option>
+                                </select>
                             </div>
 
                             <div class="form-group">
@@ -258,44 +280,49 @@
                     <BR/>
 
                     <div>
-                        <table id="results-table" th:if="${isNotMobile}">
-                            <thead>
-                                <tr id="results-table-header">
-                                    <th>Ticker</th>
-                                    <th>Total Gain(%)</th>
-                                    <th>Worst Day(-%)</th>
-                                    <th>Best Day(+%)</th>
-                                    <th>Profit Margin(%)</th>
-                                    <th>Debt(%)</th>
-                                    <th>Projected Cash burn(%)</th>
-                                </tr>
-                            </thead>
-                            <tr th:each="s: ${stocks}">
-                                <td th:text="${s.ticker}" />
-                                <td th:text="${s.windowDelta}" />
-                                <td th:text="${s.minDelta}" />
-                                <td th:text="${s.maxDelta}" />
-                                <td th:text="${s.profitMargin}" />
-                                <td th:text="${s.debtRatio}" th:style="${s.flagDebtRatio} ?'color: red; font-weight: bolder;' : ''" />
-                                <td th:text="(${s.cashBurnRate} == null OR ${s.cashBurnRate} > 0) ? '': ${s.cashBurnRateMag}" th:style="${s.flagBurnRate} ?'color: red; font-weight: bolder;' : ''"/>
-                            </tr>
-                        </table>
-                        <div th:unless="${isNotMobile}">
-                            <HR class="mobile-rule"/>
-                            <div th:each="s: ${stocks}">
-                                <table class="results-table-mobile">
-                                    <tr><td>Ticker</td><td th:text="${s.ticker}" /></tr>
-                                    <tr><td>Total Gain(%)</td><td th:text="${s.windowDelta}" /></tr>
-                                    <tr><td>Worst Day(-%)</td><td th:text="${s.minDelta}" /></tr>
-                                    <tr><td>Best Day(+%)</td><td th:text="${s.maxDelta}" /></tr>
-                                    <tr><td>Profit Margin(%)</td><td th:text="${s.profitMargin}" /></tr>
-                                    <tr><td>Debt(%)</td><td th:text="${s.debtRatio}" /></tr>
-                                    <tr><td>Cash burn(%)</td><td th:text="${s.cashBurnRate}" /></tr>
-                                </table>
-                                <BR/>
-                                <HR class="mobile-rule"/>
-                            </div>
+                        <div id="unsupported-container" th:if="${unsupported}">
                         </div>
+                        <th:block th:unless="${unsupported}">
+                            <table id="results-table" th:if="${isNotMobile}">
+                                <thead>
+                                    <tr id="results-table-header">
+                                        <th>Ticker</th>
+                                        <th>Total Gain(%)</th>
+                                        <th>Worst Day(-%)</th>
+                                        <th>Best Day(+%)</th>
+                                        <th>Profit Margin(%)</th>
+                                        <th>Debt(%)</th>
+                                        <th>Projected Cash burn(%)</th>
+                                    </tr>
+                                </thead>
+                                <tr th:each="s: ${stocks}">
+                                    <td th:text="${s.ticker}" />
+                                    <td th:text="${s.windowDelta}" />
+                                    <td th:text="${s.minDelta}" />
+                                    <td th:text="${s.maxDelta}" />
+                                    <td th:text="${s.profitMargin}" />
+                                    <td th:text="${s.debtRatio}" th:style="${s.flagDebtRatio} ?'color: red; font-weight: bolder;' : ''" />
+                                    <td th:text="(${s.cashBurnRate} == null OR ${s.cashBurnRate} > 0) ? '': ${s.cashBurnRateMag}" th:style="${s.flagBurnRate} ?'color: red; font-weight: bolder;' : ''"/>
+                                </tr>
+                            </table>
+                            <div th:unless="${isNotMobile}">
+                                <HR class="mobile-rule"/>
+                                <div th:each="s: ${stocks}">
+                                    <table class="results-table-mobile">
+                                        <tr><td>Ticker</td><td th:text="${s.ticker}" /></tr>
+                                        <tr><td>Total Gain(%)</td><td th:text="${s.windowDelta}" /></tr>
+                                        <tr><td>Worst Day(-%)</td><td th:text="${s.minDelta}" /></tr>
+                                        <tr><td>Best Day(+%)</td><td th:text="${s.maxDelta}" /></tr>
+                                        <tr><td>Profit Margin(%)</td><td th:text="${s.profitMargin}" /></tr>
+                                        <tr><td>Debt(%)</td><td th:text="${s.debtRatio}" /></tr>
+                                        <tr><td>Cash burn(%)</td><td th:text="${s.cashBurnRate}" /></tr>
+                                    </table>
+                                    <BR/>
+                                    <HR class="mobile-rule"/>
+                                </div>
+                            </div>
+                            <span id="notFound" style="display: none" th:if="${notFound}"/>
+                        </th:block>
                     </div>
 
                     <div id="pagination-buttons">
@@ -304,6 +331,7 @@
                             <input type="hidden" name="time_window" th:value="${timeWindow}">
                             <input type="hidden" name="volatility_limit" th:value="${volatilityLimit}">
                             <input type="hidden" name="profitability" th:value="${profitability}">
+                            <input type="hidden" name="order_descending" th:value="${orderDescending}">
                             <button> < </button>
                         </form>
                         <form th:if="${next != null}" action="/" method = "GET" style="display: inline-block;">
@@ -311,6 +339,7 @@
                             <input type="hidden" name="time_window" th:value="${timeWindow}">
                             <input type="hidden" name="volatility_limit" th:value="${volatilityLimit}">
                             <input type="hidden" name="profitability" th:value="${profitability}">
+                            <input type="hidden" name="order_descending" th:value="${orderDescending}">
                             <button> > </button>
                         </form>
                     </div>

@@ -1,6 +1,6 @@
 package com.midas.helmet.domain
 
-import com.midas.helmet.configuration.repositories.StockInfoRepository
+import com.midas.helmet.repositories.StockInfoRepository
 import jakarta.annotation.PostConstruct
 import jakarta.persistence.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -8,20 +8,16 @@ import org.springframework.stereotype.Component
 import java.io.Serializable
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.math.abs
 
 @Entity
 @Table(name="v_stock_info")
 class StockInfo {
-    /*@Id
-    @Column(name="id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private val id: Long = -1L*/
     @Embeddable
     private class StockInfoId(val ticker: String, val timeWindow: Int) : Serializable
 
     @EmbeddedId
     private val id: StockInfoId
-    //private val ticker: String
     private val name: String?
     private val windowDelta: Double
     private val minDelta: Double
@@ -31,7 +27,8 @@ class StockInfo {
     private val debtPercentage: Double?
     @Column(name = "cfo_working_capital")
     private val cashBurnRate: Double?
-    //private val timeWindow: Int
+    private val secSectorCode: Int?
+    private val otc: Boolean?
 
     class StockInfoDto (
         val ticker: String,
@@ -57,18 +54,20 @@ class StockInfo {
         profitMargin: Double?,
         debtRatio: Double?,
         cashBurnRate: Double?,
-        timeWindow: Int
+        timeWindow: Int,
+        secSectorCode: Int?,
+        otc: Boolean?
     ) {
-        //this.ticker       = ticker
-        this.name         = name
-        this.windowDelta  = windowDelta
-        this.minDelta     = minDelta
-        this.maxDelta     = maxDelta
-        this.profitMargin = profitMargin
-        this.debtPercentage    = debtRatio
-        this.cashBurnRate = cashBurnRate
-        //this.timeWindow   = timeWindow
-        this.id           = StockInfoId(ticker = ticker, timeWindow = timeWindow)
+        this.name           = name
+        this.windowDelta    = windowDelta
+        this.minDelta       = minDelta
+        this.maxDelta       = maxDelta
+        this.profitMargin   = profitMargin
+        this.debtPercentage = debtRatio
+        this.cashBurnRate   = cashBurnRate
+        this.id             = StockInfoId(ticker = ticker, timeWindow = timeWindow)
+        this.secSectorCode  = secSectorCode
+        this.otc            = otc
     }
 
 
@@ -111,26 +110,27 @@ class StockInfo {
         private val allStocks: MutableSet<StockInfo>            = HashSet()
         private val stocksByTicker: MutableMap<String, MutableMap<Int, StockInfo>> = HashMap()
 
-
         //How do you paginate this since you have to start and stop?
-        fun queryProfitableStocks(start: Int,size: Int, timeWindow: Int, min: Double, max: Double): List<StockInfoDto> {
+        fun queryProfitableStocks(start: Int,size: Int, timeWindow: Int, min: Double, max: Double, orderDescending: Boolean): List<StockInfoDto> {
             return query(
-                start      = start,
-                size       = size,
-                timeWindow = timeWindow,
-                set        = profitableStocksOnly,
-                min        = min,
-                max        = max
+                start           = start,
+                size            = size,
+                timeWindow      = timeWindow,
+                set             = profitableStocksOnly,
+                min             = min,
+                max             = max,
+                orderDescending = orderDescending
             )
         }
-        fun queryAllStocks(start: Int,size: Int, timeWindow: Int, min: Double, max: Double): List<StockInfoDto> {
+        fun queryAllStocks(start: Int,size: Int, timeWindow: Int, min: Double, max: Double, orderDescending: Boolean): List<StockInfoDto> {
             return query(
-                start      = start,
-                size       = size,
-                timeWindow = timeWindow,
-                set        = allStocks,
-                min        = min,
-                max        = max
+                start           = start,
+                size            = size,
+                timeWindow      = timeWindow,
+                set             = allStocks,
+                min             = min,
+                max             = max,
+                orderDescending = orderDescending
             )
         }
 
@@ -138,13 +138,29 @@ class StockInfo {
             return stocksByTicker[ticker.lowercase()]?.get(timeWindow)
         }
 
+        /** TODO: Given the way things are structured all filtering should probably be done here against one
+         * data structure instead of one for profitable stocks and one for all stocks so we can easily
+         * toggle in one place as an OTC and medical button are eventually added to the UI.
+         */
+
         private fun filterStandardQuery(timeWindow: Int,
                                         set: Set<StockInfo>,
                                         min: Double,
-                                        max: Double) : List<StockInfo> {
-            return set.filter {
-                it.id.timeWindow == timeWindow && it.maxDelta <= max && it.minDelta >= min
-            }.sortedByDescending { it.windowDelta }
+                                        max: Double,
+                                        orderDescending: Boolean) : List<StockInfo> {
+            val results = set.filter {
+                (it.id.timeWindow == timeWindow) &&
+                (it.maxDelta <= max) &&
+                (it.minDelta >= min) &&
+                (it.secSectorCode != 283) &&
+                (!("$it.secSectorCode".startsWith("38"))) &&
+                (!("$it.secSectorCode".startsWith("80"))) &&
+                (it.otc == false)
+            }
+            if(orderDescending) {
+                return results.sortedByDescending { it.windowDelta }
+            }
+            return results.sortedBy { it.windowDelta }
         }
 
         private fun query(
@@ -153,33 +169,36 @@ class StockInfo {
                 timeWindow: Int,
                 set: Set<StockInfo>,
                 min: Double,
-                max: Double
+                max: Double,
+                orderDescending: Boolean
         ) : List<StockInfoDto> {
             val results: List<StockInfo> = filterStandardQuery(
-                timeWindow = timeWindow,
-                min = min,
-                max = max,
-                set = set
+                timeWindow      = timeWindow,
+                min             = min,
+                max             = max,
+                set             = set,
+                orderDescending = orderDescending
             )
 
             var endIndex = start + size
             if(endIndex >= results.size) {
                 endIndex = results.size
             }
+            //Todo: The DTOafication of the domain data needs to be abstracted because its utilized in two methods
             return results.subList(start, endIndex).map { x ->
                 StockInfoDto(
-                    ticker       = x.id.ticker,
-                    name         = x.name,
-                    windowDelta  = x.windowDelta,
-                    minDelta     = x.minDelta,
-                    maxDelta     = x.maxDelta,
-                    profitMargin = x.profitMargin,
-                    debtRatio    = x.debtPercentage,
-                    flagDebtRatio = if(x.debtPercentage != null && x.debtPercentage > 50.0) { true } else { false },
-                    cashBurnRate = x.cashBurnRate,
-                    cashBurnRateMag = if( x.cashBurnRate != null && x.cashBurnRate <0) { Math.abs(x.cashBurnRate) } else { null },
-                    showBurnRate = if(x.cashBurnRate != null && x.cashBurnRate < 0) { true } else { false },
-                    flagBurnRate = if(x.cashBurnRate != null && x.cashBurnRate < -100) { true } else { false }
+                    ticker          = x.id.ticker,
+                    name            = x.name,
+                    windowDelta     = x.windowDelta,
+                    minDelta        = x.minDelta,
+                    maxDelta        = x.maxDelta,
+                    profitMargin    = x.profitMargin,
+                    debtRatio       = x.debtPercentage,
+                    flagDebtRatio   = x.debtPercentage != null && x.debtPercentage > 50.0,
+                    cashBurnRate    = x.cashBurnRate,
+                    cashBurnRateMag = if( x.cashBurnRate != null && x.cashBurnRate <0) { abs(x.cashBurnRate) } else { null },
+                    showBurnRate    = x.cashBurnRate != null && x.cashBurnRate < 0,
+                    flagBurnRate    = x.cashBurnRate != null && x.cashBurnRate <= -100
                )
             }
         }
@@ -193,19 +212,18 @@ class StockInfo {
 
              resultList.add(
                 StockInfoDto(
-                    ticker       = x.id.ticker,
-                    name         = x.name,
-                    windowDelta  = x.windowDelta,
-                    minDelta     = x.minDelta,
-                    maxDelta     = x.maxDelta,
-                    profitMargin = x.profitMargin,
-                    debtRatio    = x.debtPercentage,
-                    //cashBurnRate = x.cashBurnRate
-                            flagDebtRatio = if(x.debtPercentage != null && x.debtPercentage > 50.0) { true } else { false },
-                    cashBurnRate = x.cashBurnRate,
-                    cashBurnRateMag = if( x.cashBurnRate != null && x.cashBurnRate <0) { Math.abs(x.cashBurnRate) } else { null },
-                    showBurnRate = if(x.cashBurnRate != null && x.cashBurnRate < 0) { true } else { false },
-                    flagBurnRate = if(x.cashBurnRate != null && x.cashBurnRate < -100) { true } else { false }
+                    ticker          = x.id.ticker,
+                    name            = x.name,
+                    windowDelta     = x.windowDelta,
+                    minDelta        = x.minDelta,
+                    maxDelta        = x.maxDelta,
+                    profitMargin    = x.profitMargin,
+                    debtRatio       = x.debtPercentage,
+                    flagDebtRatio   = x.debtPercentage != null && x.debtPercentage > 50.0,
+                    cashBurnRate    = x.cashBurnRate,
+                    cashBurnRateMag = if( x.cashBurnRate != null && x.cashBurnRate <0) { abs(x.cashBurnRate) } else { null },
+                    showBurnRate    = x.cashBurnRate != null && x.cashBurnRate < 0,
+                    flagBurnRate    = x.cashBurnRate != null && x.cashBurnRate <= -100
                 )
             )
             return resultList

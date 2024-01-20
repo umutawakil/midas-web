@@ -1,4 +1,4 @@
-package com.midas.helmet.configuration.repositories
+package com.midas.helmet.repositories
 
 import com.midas.helmet.domain.StockInfo
 import org.springframework.data.repository.CrudRepository

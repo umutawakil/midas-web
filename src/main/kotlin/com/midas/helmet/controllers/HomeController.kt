@@ -2,17 +2,25 @@ package com.midas.helmet.controllers
 
 import com.midas.helmet.configuration.ApplicationProperties
 import com.midas.helmet.domain.StockInfo
+import com.midas.helmet.domain.Subscriber
+import com.midas.helmet.domain.UnsupportedTicker
+import com.midas.helmet.domain.value.EmailAddress
+import com.midas.helmet.services.LoggingService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.ui.set
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.ResponseBody
 import kotlin.math.abs
 
 @Controller
 class HomeController(
-    @Autowired private val applicationProperties: ApplicationProperties
+    @Autowired private val applicationProperties: ApplicationProperties,
+    @Autowired private val loggingService: LoggingService
 ) {
     @GetMapping("/")
     fun index(
@@ -20,44 +28,51 @@ class HomeController(
         @RequestParam(name="ticker", required = false) ticker: String?,
         @RequestParam(name="start", required = false) s: Int?,
         @RequestParam(name="profitability", required = false) p: Boolean?,
+        @RequestParam(name="order_descending", required = false) o: Boolean?,
         @RequestParam(name="time_window", required = false)  t: Int?,
         @RequestParam(name="volatility_limit", required = false)  v: Int?
     ): String {
         val start           = if(ticker?.isNotEmpty() == true) { 0 } else {s?: 0 }
-        val profitability   = if(ticker?.isNotEmpty() == true) { false } else {p ?: false}
+        val profitability   = p ?: false
+        val orderDescending = o ?: true
         val timeWindow      = t ?: applicationProperties.defaultTimeWindow
         val volatilityLimit = if(ticker?.isNotEmpty() == true) { 1000 } else {v ?: applicationProperties.defaultVolatilityLimit }
 
         /** TODO: Temporary hack so extra pages aren't made to support viewTicker logic **/
         if(ticker?.isNotEmpty() == true) {
-            model["stocks"] = StockInfo.queryTicker(
+            val stocks = StockInfo.queryTicker(
                 ticker     = ticker,
                 timeWindow = timeWindow
             )
-
+            model["stocks"]          = stocks
+            model["notFound"]        = if (stocks.isEmpty()) { true } else { null }
+            model["unsupported"]     = if (UnsupportedTicker.isNotSupported(ticker)) { true } else { null }
             model["ticker"]          = ticker
             model["timeWindow"]      = timeWindow
             model["volatilityLimit"] = volatilityLimit
-            model["profitability"]   = profitability
+            model["profitability"]   = if(profitability) { 1 } else { 0}
+            model["orderDescending"] = if(orderDescending) { 1 } else { 0}
 
             return "index"
         }
 
         val results: List<StockInfo.StockInfoDto> = if(profitability) {
             StockInfo.queryProfitableStocks(
-                start      = start,
-                size       = applicationProperties.standardResultsPerPage + 1,
-                timeWindow = timeWindow,
-                min        = (-1.0)*abs(volatilityLimit),
-                max        = 1.0*abs(volatilityLimit)
+                start           = start,
+                size            = applicationProperties.standardResultsPerPage + 1,
+                timeWindow      = timeWindow,
+                min             = (-1.0)*abs(volatilityLimit),
+                max             = 1.0*abs(volatilityLimit),
+                orderDescending = orderDescending
             )
         } else {
             StockInfo.queryAllStocks(
-                start      = start,
-                size       = applicationProperties.standardResultsPerPage + 1,
-                timeWindow = timeWindow,
-                min        = (-1.0)*abs(volatilityLimit),
-                max        = 1.0*abs(volatilityLimit)
+                start           = start,
+                size            = applicationProperties.standardResultsPerPage + 1,
+                timeWindow      = timeWindow,
+                min             = (-1.0)*abs(volatilityLimit),
+                max             = 1.0*abs(volatilityLimit),
+                orderDescending = orderDescending
             )
         }
 
@@ -74,8 +89,35 @@ class HomeController(
 
         model["timeWindow"]      = timeWindow
         model["volatilityLimit"] = volatilityLimit
-        model["profitability"]   = profitability
+        model["profitability"]   = if(profitability) { 1 } else { 0}
+        model["orderDescending"] = if(orderDescending) { 1 } else { 0}
 
         return "index"
+    }
+
+    @PostMapping("/newsletter")
+    @ResponseBody
+    fun subscribe(
+        model: Model,
+        @RequestParam(name="email", required = true) email: String,
+        @RequestParam(name="time_zone_offset", required = true) timeZoneOffset: String
+    ): String {
+        Subscriber.sendConfirmationEmail(
+            email          = EmailAddress(email),
+            timeZoneOffset = timeZoneOffset
+        )
+        return "1"
+    }
+
+    @GetMapping("/confirm-email/{token}")
+    @ResponseBody
+    fun confirmEmailAddress(
+        model: Model,
+        @PathVariable(name="token", required = true) token: String
+    ): String {
+        if(Subscriber.confirmEmailAddress(token = token)) {
+            return "Email address confirmed!"
+        }
+        return "Invalid or expired link."
     }
 }

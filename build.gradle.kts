@@ -22,6 +22,7 @@ repositories {
 }
 
 dependencies {
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
@@ -32,6 +33,12 @@ dependencies {
 	implementation("mysql:mysql-connector-java:8.0.33")
 	implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
 	implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0")
+
+	implementation("com.amazonaws:aws-java-sdk-ses:1.12.349")
+	implementation("com.amazonaws:aws-java-sdk-sqs:1.12.327")
+	implementation("software.amazon.awssdk:utils:2.17.281")
+
+	implementation("com.googlecode.json-simple:json-simple:1.1.1")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
