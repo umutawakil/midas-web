@@ -295,7 +295,7 @@
       "Type" : "AWS::CloudFront::Distribution",
       "Properties" : {
           "DistributionConfig" : {
-              "Aliases" : [{"Ref": "DomainName"}],
+              "Aliases" : [{"Ref": "DomainName"},{"Fn::Join": ["",["www.",{"Ref": "DomainName"}]]}],
               "ViewerCertificate": {
                 "AcmCertificateArn" : {"Ref" : "SSLCertificateARN"},
                 "SslSupportMethod": "sni-only",
@@ -351,6 +351,20 @@
         "AliasTarget" : {
           "HostedZoneId": {"Ref" : "CloudFrontZoneId"},
           "DNSName" : {"Fn::GetAtt": ["ProxyCdn", "DomainName"]}
+        }
+      }
+    },
+    "ProxyDnsRecordWww": {
+      "Type": "AWS::Route53::RecordSet",
+      "DependsOn": ["ProxyDnsRecord"],
+      "Properties": {
+        "HostedZoneName": {"Fn::Join": ["",[{"Ref": "HostedZone"},"."]]},
+        "Comment": "WWW Domain name ",
+        "Name" : {"Fn::Join": ["",["www.",{"Ref": "DomainName"}]]},
+        "Type" : "A",
+        "AliasTarget" : {
+          "HostedZoneId": {"Ref" : "HostedZoneId"},
+          "DNSName" : {"Ref": "DomainName"}
         }
       }
     },
