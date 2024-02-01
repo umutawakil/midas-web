@@ -1,0 +1,57 @@
+<div id="search-filter" th:fragment="search-filter">
+    <form id="main-form" action="/ticker" method = "GET">
+        <div th:class =" ${isNotMobile} ? 'home-page-option' : 'home-page-option-mobile'">
+            <!--<div id="profitability-switch" class="form-group">
+                <label for = "profitability">Profitable Only</label>
+                <label class="switch">
+                    <input id = "profitability" name = "profitability" value = "1" type="checkbox">
+                    <span class="slider round"></span>
+                </label>
+            </div>-->
+            <div class="form-group">
+                <select id="profitability" name="profitability" th:class ="${isNotMobile} ? 'form-select select-control' : 'form-select select-control-mobile'" style="font-size: 1.5em; width: 320px;">
+                    <option value = "0">All Stocks</option>
+                    <option value = "1">Profitable Only</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <select id="order_descending" name = "order_descending" th:class ="${orderDescending} ? 'form-select select-control' : 'form-select select-control-mobile'" style="font-size: 1.5em; width: 320px;">
+                    <option value = "1">Increasing first (Bulls)</option>
+                    <option value = "0">Decreasing first (Bears)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <select id="time_window" name = "time_window" th:class ="${isNotMobile} ? 'form-select select-control' : 'form-select select-control-mobile'" style="font-size: 1.5em; width: 320px;">
+                    <option value = "3">Past 3 Days</option>
+                    <option value = "5">Past Week</option>
+                    <option value = "10">Past 2 Weeks</option>
+                    <option value = "20">Past Month</option>
+                    <option value = "40">Past 2 Months</option>
+                    <option value = "60">Past 3 Months</option>
+                </select>
+            </div>
+            <div id="volatility-form-group" class="form-group">
+                <select id="volatility_limit" name = "volatility_limit" th:class ="${isNotMobile} ? 'form-select select-control' : 'form-select select-control-mobile'" style="font-size: 1.5em; width: 320px;">
+                    <option value = "5">(+/-) 5%</option>
+                    <option value = "10">(+/-) 10%</option>
+                    <option value = "15">(+/-) 15%</option>
+                    <option value = "20">(+/-) 20%</option>
+                    <option value = "25">(+/-) 25%</option>
+                    <option value = "30">(+/-) 30%</option>
+                    <option value = "1000">(+/-) 100%</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input th:value="${ticker}" id="ticker-input" name="ticker" type="text"  th:class="${isNotMobile} ? 'form-control input-control': 'form-control input-control-mobile'" placeholder="Enter Symbol (Optional)" style="font-size: 1.5em; width: 320px;">
+            </div>
+
+        </div>
+
+        <div>
+            <button id="search-button">Search</button>
+        </div>
+
+    </form>
+</div>

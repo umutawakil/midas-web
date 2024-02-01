@@ -4,17 +4,12 @@
         <link rel="stylesheet" href="/app.css">
         <script type="text/javascript">
             function init() {
-                var stash           = document.getElementById("stash");
-                var profitability   = stash.getAttribute("profitability");
-                var timeWindow      = stash.getAttribute("timeWindow");
-                var volatilityLimit = stash.getAttribute("volatilityLimit");
-                var orderDescending = stash.getAttribute("orderDescending");
-
-                document.getElementById("profitability").value    = profitability;
-                document.getElementById("time_window").value      = timeWindow;
-                document.getElementById("volatility_limit").value = volatilityLimit;
-                document.getElementById("order_descending").value = orderDescending;
-                console.log("P: " + profitability +", timeWindow: " + timeWindow +", volatilityLimit: " + volatilityLimit);
+                if (document.getElementById("unsupported-container")) {
+                    alert("Sorry! That stock is currently not providing us with standard US accounting information and is most likely a foreign company. We are working on integrating them. Please shoot us a message on Twitter telling us to hurry up!!!");
+                }
+                if (document.getElementById("notFound")) {
+                    alert("No stock with that symbol can be found. Type the stock ticker or symbol (not the company name). Check your spelling. Send us a message on Twitter if you are sure you spelt the ticker correctly.")
+                }
             }
         </script>
     </head>
@@ -23,29 +18,33 @@
             <div id="slogan">
                 <H1 id="main-icon">Sort the stock market!</H1>
             </div>
-            <span id="stash" style="display: none" th:attr="ticker=${ticker},timeWindow=${timeWindow},profitability=${profitability}, volatilityLimit=${volatilityLimit}, orderDescending=${orderDescending}"></span>
+
             <div id="main-center-div">
-                    <div th:include="fragments/search-filter.html :: search-filter"></div>
-                    <BR/>
+                <!--<div th:include="fragments/search-filter.html :: search-filter"></div>-->
+                <H1 th:text="${ticker}"></H1>
+                <BR/>
 
-                    <BR/>
+                <BR/>
 
-                    <div>
+                <div>
+                    <div id="unsupported-container" th:if="${unsupported}">
+                    </div>
+                    <th:block th:unless="${unsupported}">
                         <table id="results-table" th:if="${isNotMobile}">
                             <thead>
-                                <tr id="results-table-header">
-                                    <th></th>
-                                    <th>Total Gain(%)</th>
-                                    <th>Worst Day(%)</th>
-                                    <th>Best Day(%)</th>
-                                    <th>Profit(%)</th>
-                                    <th>Debt(%)</th>
-                                    <th>Burn(%)</th>
-                                    <th>VolumeΔ(%)</th>
-                                </tr>
+                            <tr id="results-table-header">
+                                <th>Past Days</th>
+                                <th>Total Gain(%)</th>
+                                <th>Worst Day(%)</th>
+                                <th>Best Day(%)</th>
+                                <th>Profit(%)</th>
+                                <th>Debt(%)</th>
+                                <th>Burn(%)</th>
+                                <th>VolumeΔ(%)</th>
+                            </tr>
                             </thead>
                             <tr th:each="s: ${stocks}">
-                                <td th:text="${s.ticker}" />
+                                <td th:text="${s.timeWindow}" />
                                 <td th:text="${s.windowDelta}" />
                                 <td th:text="${s.minDelta}" />
                                 <td th:text="${s.maxDelta}" />
@@ -87,28 +86,10 @@
                             </div>
                         </div>
                         <span id="notFound" style="display: none" th:if="${notFound}"/>
-                    </div>
-
-                    <div id="pagination-buttons">
-                        <form th:if="${back != null}" action="/" method = "GET" style="display: inline-block;">
-                            <input type="hidden" name="start" th:value="${back}">
-                            <input type="hidden" name="time_window" th:value="${timeWindow}">
-                            <input type="hidden" name="volatility_limit" th:value="${volatilityLimit}">
-                            <input type="hidden" name="profitability" th:value="${profitability}">
-                            <input type="hidden" name="order_descending" th:value="${orderDescending}">
-                            <button> < </button>
-                        </form>
-                        <form th:if="${next != null}" action="/" method = "GET" style="display: inline-block;">
-                            <input type="hidden" name="start" th:value="${next}">
-                            <input type="hidden" name="time_window" th:value="${timeWindow}">
-                            <input type="hidden" name="volatility_limit" th:value="${volatilityLimit}">
-                            <input type="hidden" name="profitability" th:value="${profitability}">
-                            <input type="hidden" name="order_descending" th:value="${orderDescending}">
-                            <button> > </button>
-                        </form>
-                    </div>
-
+                    </th:block>
                 </div>
+
+            </div>
         </th:block>
 
     </body>

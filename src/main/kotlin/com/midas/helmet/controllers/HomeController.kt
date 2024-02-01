@@ -25,36 +25,17 @@ class HomeController(
     @GetMapping("/")
     fun index(
         model: Model,
-        @RequestParam(name="ticker", required = false) ticker: String?,
         @RequestParam(name="start", required = false) s: Int?,
         @RequestParam(name="profitability", required = false) p: Boolean?,
         @RequestParam(name="order_descending", required = false) o: Boolean?,
         @RequestParam(name="time_window", required = false)  t: Int?,
         @RequestParam(name="volatility_limit", required = false)  v: Int?
     ): String {
-        val start           = if(ticker?.isNotEmpty() == true) { 0 } else {s?: 0 }
+        val start           = s?: 0
         val profitability   = p ?: false
         val orderDescending = o ?: true
         val timeWindow      = t ?: applicationProperties.defaultTimeWindow
-        val volatilityLimit = if(ticker?.isNotEmpty() == true) { 1000 } else {v ?: applicationProperties.defaultVolatilityLimit }
-
-        /** TODO: Temporary hack so extra pages aren't made to support viewTicker logic **/
-        if(ticker?.isNotEmpty() == true) {
-            val stocks = StockInfo.queryTicker(
-                ticker     = ticker,
-                timeWindow = timeWindow
-            )
-            model["stocks"]          = stocks
-            model["notFound"]        = if (stocks.isEmpty()) { true } else { null }
-            model["unsupported"]     = if (UnsupportedTicker.isNotSupported(ticker)) { true } else { null }
-            model["ticker"]          = ticker
-            model["timeWindow"]      = timeWindow
-            model["volatilityLimit"] = volatilityLimit
-            model["profitability"]   = if(profitability) { 1 } else { 0}
-            model["orderDescending"] = if(orderDescending) { 1 } else { 0}
-
-            return "index"
-        }
+        val volatilityLimit = v ?: applicationProperties.defaultVolatilityLimit
 
         val results: List<StockInfo.StockInfoDto> = if(profitability) {
             StockInfo.queryProfitableStocks(
@@ -93,6 +74,20 @@ class HomeController(
         model["orderDescending"] = if(orderDescending) { 1 } else { 0}
 
         return "index"
+    }
+
+    @GetMapping("/ticker/{t}")
+    fun getTickerInfo(
+        model: Model,
+        @PathVariable(name="t", required = true) ticker: String
+    ): String {
+        val stocks            = StockInfo.queryTickerWindows(ticker)
+        model["stocks"]       = stocks
+        model["unsupported"]  = if (UnsupportedTicker.isNotSupported(ticker)) { true } else { null }
+        model["notFound"]     = if (stocks.isEmpty()) { true } else { null }
+        model["ticker"]       = ticker
+
+        return "ticker"
     }
 
     @PostMapping("/newsletter")

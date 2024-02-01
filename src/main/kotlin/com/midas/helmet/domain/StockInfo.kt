@@ -22,6 +22,7 @@ class StockInfo {
     private val windowDelta: Double
     private val minDelta: Double
     private val maxDelta: Double
+    private val volumeDelta: Double
     private val profitMargin: Double?
     @Column(name = "debt_percentage")
     private val debtPercentage: Double?
@@ -36,13 +37,15 @@ class StockInfo {
         val windowDelta: Double,
         val minDelta: Double,
         val maxDelta: Double,
+        val volumeDelta: Double,
         val profitMargin: Double?,
         val debtRatio: Double?,
         val flagDebtRatio: Boolean,
         val cashBurnRate: Double?,
         val cashBurnRateMag: Double?,
         val showBurnRate: Boolean,
-        val flagBurnRate: Boolean
+        val flagBurnRate: Boolean,
+        val timeWindow: Int
     )
 
     constructor(
@@ -51,6 +54,7 @@ class StockInfo {
         windowDelta: Double,
         minDelta: Double,
         maxDelta: Double,
+        volumeDelta: Double,
         profitMargin: Double?,
         debtRatio: Double?,
         cashBurnRate: Double?,
@@ -62,6 +66,7 @@ class StockInfo {
         this.windowDelta    = windowDelta
         this.minDelta       = minDelta
         this.maxDelta       = maxDelta
+        this.volumeDelta    = volumeDelta
         this.profitMargin   = profitMargin
         this.debtPercentage = debtRatio
         this.cashBurnRate   = cashBurnRate
@@ -109,6 +114,7 @@ class StockInfo {
         private val profitableStocksOnly: MutableSet<StockInfo> = HashSet()
         private val allStocks: MutableSet<StockInfo>            = HashSet()
         private val stocksByTicker: MutableMap<String, MutableMap<Int, StockInfo>> = HashMap()
+        private val timeWindows: List<Int> = listOf(3, 5, 10, 20, 40, 60)
 
         //How do you paginate this since you have to start and stop?
         fun queryProfitableStocks(start: Int,size: Int, timeWindow: Int, min: Double, max: Double, orderDescending: Boolean): List<StockInfoDto> {
@@ -192,15 +198,23 @@ class StockInfo {
                     windowDelta     = x.windowDelta,
                     minDelta        = x.minDelta,
                     maxDelta        = x.maxDelta,
+                    volumeDelta     = x.volumeDelta,
                     profitMargin    = x.profitMargin,
                     debtRatio       = x.debtPercentage,
                     flagDebtRatio   = x.debtPercentage != null && x.debtPercentage > 50.0,
                     cashBurnRate    = x.cashBurnRate,
                     cashBurnRateMag = if( x.cashBurnRate != null && x.cashBurnRate <0) { abs(x.cashBurnRate) } else { null },
                     showBurnRate    = x.cashBurnRate != null && x.cashBurnRate < 0,
-                    flagBurnRate    = x.cashBurnRate != null && x.cashBurnRate <= -100
+                    flagBurnRate    = x.cashBurnRate != null && x.cashBurnRate <= -100,
+                    timeWindow      = timeWindow
                )
             }
+        }
+
+        fun queryTickerWindows(ticker: String) : List<StockInfoDto> {
+            return timeWindows.map {
+                queryTicker(ticker = ticker, timeWindow = it)[0]
+            }.sortedBy {it.timeWindow}
         }
 
         fun queryTicker(
@@ -217,13 +231,15 @@ class StockInfo {
                     windowDelta     = x.windowDelta,
                     minDelta        = x.minDelta,
                     maxDelta        = x.maxDelta,
+                    volumeDelta     = x.volumeDelta,
                     profitMargin    = x.profitMargin,
                     debtRatio       = x.debtPercentage,
                     flagDebtRatio   = x.debtPercentage != null && x.debtPercentage > 50.0,
                     cashBurnRate    = x.cashBurnRate,
                     cashBurnRateMag = if( x.cashBurnRate != null && x.cashBurnRate <0) { abs(x.cashBurnRate) } else { null },
                     showBurnRate    = x.cashBurnRate != null && x.cashBurnRate < 0,
-                    flagBurnRate    = x.cashBurnRate != null && x.cashBurnRate <= -100
+                    flagBurnRate    = x.cashBurnRate != null && x.cashBurnRate <= -100,
+                    timeWindow      = timeWindow
                 )
             )
             return resultList
