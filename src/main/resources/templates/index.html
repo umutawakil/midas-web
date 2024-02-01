@@ -35,17 +35,17 @@
                             <thead>
                                 <tr id="results-table-header">
                                     <th></th>
-                                    <th>Total Gain(%)</th>
-                                    <th>Worst Day(%)</th>
-                                    <th>Best Day(%)</th>
-                                    <th>Profit(%)</th>
-                                    <th>Debt(%)</th>
-                                    <th>Burn(%)</th>
-                                    <th>VolumeΔ(%)</th>
+                                    <th>Total Gain (%)</th>
+                                    <th>Worst Day (%)</th>
+                                    <th>Best Day (%)</th>
+                                    <th>Profit (%)</th>
+                                    <th>Debt (%)</th>
+                                    <th>Burn (%)</th>
+                                    <th>VolumeΔ (%)</th>
                                 </tr>
                             </thead>
                             <tr th:each="s: ${stocks}">
-                                <td th:text="${s.ticker}" />
+                                <td><a th:href="${'/ticker/' +s.ticker}" th:text="${s.ticker}"/></td>
                                 <td th:text="${s.windowDelta}" />
                                 <td th:text="${s.minDelta}" />
                                 <td th:text="${s.maxDelta}" />
@@ -62,11 +62,11 @@
                             <HR class="mobile-rule"/>
                             <div th:each="s: ${stocks}">
                                 <table class="results-table-mobile">
-                                    <tr><td>Ticker</td><td th:text="${s.ticker}" /></tr>
-                                    <tr><td>Total Gain(%)</td><td th:text="${s.windowDelta}" /></tr>
-                                    <tr><td>Worst Day(-%)</td><td th:text="${s.minDelta}" /></tr>
-                                    <tr><td>Best Day(+%)</td><td th:text="${s.maxDelta}" /></tr>
-                                    <tr><td>Profit Margin(%)</td><td th:text="${s.profitMargin}" /></tr>
+                                    <tr><td>Ticker</td><td><a th:href="${'/ticker/' + s.ticker}" th:text="${s.ticker}"></a></td></tr>
+                                    <tr><td>Total Gain (%)</td><td th:text="${s.windowDelta}" /></tr>
+                                    <tr><td>Worst Day (%)</td><td th:text="${s.minDelta}" /></tr>
+                                    <tr><td>Best Day (%)</td><td th:text="${s.maxDelta}" /></tr>
+                                    <tr><td>Profit Margin (%)</td><td th:text="${s.profitMargin}" /></tr>
 
                                     <tr th:if="${s.flagDebtRatio}"><td>Debt(%)</td><td th:text="${s.debtRatio}" style="color: red; font-weight: bolder;" /></tr>
                                     <tr th:unless="${s.flagDebtRatio}"><td>Debt(%)</td><td th:text="${s.debtRatio}"/></tr>

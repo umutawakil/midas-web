@@ -25,12 +25,17 @@ class HomeController(
     @GetMapping("/")
     fun index(
         model: Model,
+        @RequestParam(name="ticker", required = false) ticker: String?,
         @RequestParam(name="start", required = false) s: Int?,
         @RequestParam(name="profitability", required = false) p: Boolean?,
         @RequestParam(name="order_descending", required = false) o: Boolean?,
         @RequestParam(name="time_window", required = false)  t: Int?,
         @RequestParam(name="volatility_limit", required = false)  v: Int?
     ): String {
+        if((ticker != null) && ticker.isNotEmpty()) { /** TODO: This hack exists because the same form for search/filter is used to get a specific ticker **/
+            return "redirect:/ticker/$ticker"
+        }
+
         val start           = s?: 0
         val profitability   = p ?: false
         val orderDescending = o ?: true

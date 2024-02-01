@@ -21,10 +21,13 @@
 
             <div id="main-center-div">
                 <!--<div th:include="fragments/search-filter.html :: search-filter"></div>-->
-                <H1 th:text="${ticker}"></H1>
-                <BR/>
+                <H2 th:text="${ticker}"></H2>
+                <!--<BR/>
 
-                <BR/>
+                <BR/>-->
+                <div style="margin-top: 20px; margin-bottom: 15px;">
+                    <a href="/"><button> < </button></a>
+                </div>
 
                 <div>
                     <div id="unsupported-container" th:if="${unsupported}">
@@ -33,19 +36,20 @@
                         <table id="results-table" th:if="${isNotMobile}">
                             <thead>
                             <tr id="results-table-header">
-                                <th>Past Days</th>
-                                <th>Total Gain(%)</th>
-                                <th>Worst Day(%)</th>
-                                <th>Best Day(%)</th>
-                                <th>Profit(%)</th>
-                                <th>Debt(%)</th>
-                                <th>Burn(%)</th>
-                                <th>VolumeΔ(%)</th>
+                                <th>Window (Days)</th>
+                                <th>Total Gain (%)</th>
+                                <th>VolumeΔ (%)</th>
+                                <th>Worst Day (%)</th>
+                                <th>Best Day (%)</th>
+                                <th>Profit (%)</th>
+                                <th>Debt (%)</th>
+                                <th>Burn (%)</th>
                             </tr>
                             </thead>
                             <tr th:each="s: ${stocks}">
                                 <td th:text="${s.timeWindow}" />
                                 <td th:text="${s.windowDelta}" />
+                                <td th:text="${s.volumeDelta}" />
                                 <td th:text="${s.minDelta}" />
                                 <td th:text="${s.maxDelta}" />
                                 <td th:text="${s.profitMargin}" />
@@ -53,33 +57,30 @@
 
                                 <td th:if="${s.cashBurnRate} == -100" th:text="'NO CASH'" style="color: red; font-weight: bolder;" />
                                 <td th:unless="${s.cashBurnRate} == -100" th:text="(${s.cashBurnRate} == null OR ${s.cashBurnRate} > 0) ? '': ${s.cashBurnRateMag}" th:style="${s.flagBurnRate} ?'color: red; font-weight: bolder;' : ''"/>
-
-                                <td th:text="${s.volumeDelta}" />
                             </tr>
                         </table>
                         <div th:unless="${isNotMobile}">
                             <HR class="mobile-rule"/>
                             <div th:each="s: ${stocks}">
                                 <table class="results-table-mobile">
-                                    <tr><td>Ticker</td><td th:text="${s.ticker}" /></tr>
-                                    <tr><td>Total Gain(%)</td><td th:text="${s.windowDelta}" /></tr>
-                                    <tr><td>Worst Day(-%)</td><td th:text="${s.minDelta}" /></tr>
-                                    <tr><td>Best Day(+%)</td><td th:text="${s.maxDelta}" /></tr>
-                                    <tr><td>Profit Margin(%)</td><td th:text="${s.profitMargin}" /></tr>
+                                    <tr><td>Window (Days)</td><td th:text="${s.timeWindow}" /></tr>
+                                    <tr><td>Total Gain (%)</td><td th:text="${s.windowDelta}" /></tr>
+                                    <tr><td>Volume Change (%)</td><td th:text="${s.volumeDelta}" /></tr>
+                                    <tr><td>Worst Day (-%)</td><td th:text="${s.minDelta}" /></tr>
+                                    <tr><td>Best Day (+%)</td><td th:text="${s.maxDelta}" /></tr>
+                                    <tr><td>Profit (%)</td><td th:text="${s.profitMargin}" /></tr>
 
-                                    <tr th:if="${s.flagDebtRatio}"><td>Debt(%)</td><td th:text="${s.debtRatio}" style="color: red; font-weight: bolder;" /></tr>
+                                    <tr th:if="${s.flagDebtRatio}" style="color: red; font-weight: bolder;"><td>Debt(%)</td><td th:text="${s.debtRatio}"  /></tr>
                                     <tr th:unless="${s.flagDebtRatio}"><td>Debt(%)</td><td th:text="${s.debtRatio}"/></tr>
 
                                     <tr th:if="${s.cashBurnRate} == -100" style="color: red; font-weight: bolder;">
-                                        <td>Cash burn(%)</td>
+                                        <td>Cash burn (%)</td>
                                         <td>NO CASH</td>
                                     </tr>
                                     <tr th:unless="${s.cashBurnRate} == -100">
-                                        <td>Cash burn(%)</td>
+                                        <td>Cash burn (%)</td>
                                         <td th:text="${s.cashBurnRate}" />
                                     </tr>
-
-                                    <tr><td>Volume Change(%)</td><td th:text="${s.volumeDelta}" /></tr>
                                 </table>
                                 <BR/>
                                 <HR class="mobile-rule"/>
