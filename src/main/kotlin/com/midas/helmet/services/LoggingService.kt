@@ -23,15 +23,17 @@ class LoggingService (
             return
         } else {
             errorMap.add(message)
-            emailClient.send(
-                SendEmailRequest(
-                    "Bloip <${applicationProperties.serviceEmailAddress}>",
-                    Destination(listOf(applicationProperties.adminEmailAddress)),
-                    Message(
-                        Content(message).withCharset(Charsets.UTF_8.name()),
-                        Body().withText(Content(ex.message))
-                    )
+            val emailRequest = SendEmailRequest(
+                "Bloip <${applicationProperties.serviceEmailAddress}>",
+                Destination(listOf(applicationProperties.adminEmailAddress)),
+                Message(
+                    Content(message).withCharset(Charsets.UTF_8.name()),
+                    Body().withText(Content(ex.message))
                 )
+            )
+            println(emailRequest.toString())
+            emailClient.send(
+                emailRequest
             )
         }
     }
