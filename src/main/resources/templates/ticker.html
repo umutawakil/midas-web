@@ -20,11 +20,7 @@
             </div>
 
             <div id="main-center-div">
-                <!--<div th:include="fragments/search-filter.html :: search-filter"></div>-->
                 <H2 th:text="${ticker}"></H2>
-                <!--<BR/>
-
-                <BR/>-->
                 <div style="margin-top: 20px; margin-bottom: 15px;">
                     <a href="/"><button> < </button></a>
                 </div>
@@ -33,14 +29,14 @@
                     <div id="unsupported-container" th:if="${unsupported}">
                     </div>
                     <th:block th:unless="${unsupported}">
-                        <table id="results-table" th:if="${isNotMobile}">
+                        <table id="results-table">
                             <thead>
                             <tr id="results-table-header">
-                                <th>Window (Days)</th>
-                                <th>Total Gain (%)</th>
+                                <th>Days</th>
+                                <th>Gain (%)</th>
                                 <th>VolumeΔ (%)</th>
-                                <th>Worst Day (%)</th>
-                                <th>Best Day (%)</th>
+                                <th>High (%)</th>
+                                <th>Low (%)</th>
                             </tr>
                             </thead>
                             <tr th:each="s: ${stocks}">
@@ -56,7 +52,7 @@
 
                         <div style="font-size: 1.5em; color: purple;">Financials</div><BR/>
 
-                        <table id="financials-table" th:if="${isNotMobile}">
+                        <table id="financials-table">
                             <thead>
                             <tr id="financials-table-header">
                                 <th>Profit (%)</th>
@@ -72,7 +68,7 @@
                                 <td th:unless="${cashBurnRate} == -100" th:text="(${cashBurnRate} == null OR ${cashBurnRate} > 0) ? '': ${cashBurnRateMag}" th:style="${flagBurnRate} ?'color: red; font-weight: bolder;' : ''"/>
                             </tr>
                         </table>
-                        <div th:unless="${isNotMobile}">
+                        <!--<div th:unless="${isNotMobile}">
                             <HR class="mobile-rule"/>
                             <div th:each="s: ${stocks}">
                                 <table class="results-table-mobile">
@@ -98,11 +94,11 @@
                                 <BR/>
                                 <HR class="mobile-rule"/>
                             </div>
-                        </div>
+                        </div>-->
                         <span id="notFound" style="display: none" th:if="${notFound}"/>
                     </th:block>
                 </div>
-
+            <HR id="ticker-rule" style="width: 50%; display: inline-block"/>
             </div>
         </th:block>
 
