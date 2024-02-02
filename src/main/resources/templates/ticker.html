@@ -43,8 +43,8 @@
                                 <td th:text="${s.timeWindow}" />
                                 <td th:text="${s.windowDelta}" />
                                 <td th:text="${s.volumeDelta}" />
-                                <td th:text="${s.minDelta}" />
                                 <td th:text="${s.maxDelta}" />
+                                <td th:text="${s.minDelta}" />
                             </tr>
                         </table>
                         <BR/>
@@ -68,6 +68,25 @@
                                 <td th:unless="${cashBurnRate} == -100" th:text="(${cashBurnRate} == null OR ${cashBurnRate} > 0) ? '': ${cashBurnRateMag}" th:style="${flagBurnRate} ?'color: red; font-weight: bolder;' : ''"/>
                             </tr>
                         </table>
+
+                        <th:block th:if="${cashBurnRate} == -100">
+                            <BR/>
+                            <BR/>
+                            <div style="width: 50%; display: inline-block; margin-bottom: 30px;">
+                                <span style="color: red; font-size: 1.5em;">WARNING</span><BR/>
+                                This company has used up all of its available short term cash or current assets.
+                            </div>
+                        </th:block>
+
+                        <th:block th:if="${cashBurnRate} < -100">
+                            <BR/>
+                            <BR/>
+                            <div style="width: 50%; display: inline-block; margin-bottom: 30px;">
+                                <BR/><span style="color: red; font-size: 1.5em;">WARNING</span><BR/>
+                                This company is projected to burn all of their cash and/or short term assets if they don't change course.
+                            </div>
+                        </th:block>
+
                         <!--<div th:unless="${isNotMobile}">
                             <HR class="mobile-rule"/>
                             <div th:each="s: ${stocks}">
