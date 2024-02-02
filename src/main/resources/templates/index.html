@@ -68,7 +68,7 @@
                                     <tr><td>Best Day (%)</td><td th:text="${s.maxDelta}" /></tr>
                                     <tr><td>Profit Margin (%)</td><td th:text="${s.profitMargin}" /></tr>
 
-                                    <tr th:if="${s.flagDebtRatio}"><td>Debt(%)</td><td th:text="${s.debtRatio}" style="color: red; font-weight: bolder;" /></tr>
+                                    <tr style="color: red; font-weight: bolder;" th:if="${s.flagDebtRatio}"><td>Debt(%)</td><td th:text="${s.debtRatio}"  /></tr>
                                     <tr th:unless="${s.flagDebtRatio}"><td>Debt(%)</td><td th:text="${s.debtRatio}"/></tr>
 
                                     <tr th:if="${s.cashBurnRate} == -100" style="color: red; font-weight: bolder;">

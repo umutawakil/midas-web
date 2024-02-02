@@ -92,6 +92,15 @@ class HomeController(
         model["notFound"]     = if (stocks.isEmpty()) { true } else { null }
         model["ticker"]       = ticker
 
+        if (stocks.isNotEmpty()) {
+            model["profitMargin"]    = stocks[0].profitMargin
+            model["debtRatio"]       = stocks[0].debtRatio
+            model["flagBurnRate"]    = stocks[0].flagBurnRate
+            model["flagDebtRatio"]   = stocks[0].flagDebtRatio
+            model["cashBurnRate"]    = stocks[0].cashBurnRate
+            model["cashBurnRateMag"] = stocks[0].cashBurnRateMag
+        }
+
         return "ticker"
     }
 

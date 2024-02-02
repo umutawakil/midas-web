@@ -111,6 +111,29 @@ label {
     color: white;
 }
 
+/** Financials table **/
+#financials-table {
+    display: inline-block;
+    /*min-width: 1000px;
+    border: 1px solid green;*/
+}
+#financials-table tr {
+    /*width: 1500px;
+    border: 1px solid red;*/
+}
+#financials-table th {
+    padding: 15px;
+}
+#financials-table td {
+    padding: 15px;
+    width: 185px;
+}
+#financials-table tr:nth-child(even){background-color: #f3ccff;}
+#financials-table-header {
+    background-color: purple;
+    color: white;
+}
+
 .results-table-mobile {
     width: 100%;
     padding-left: 10px;

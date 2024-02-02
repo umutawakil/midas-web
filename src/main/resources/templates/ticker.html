@@ -41,9 +41,6 @@
                                 <th>VolumeΔ (%)</th>
                                 <th>Worst Day (%)</th>
                                 <th>Best Day (%)</th>
-                                <th>Profit (%)</th>
-                                <th>Debt (%)</th>
-                                <th>Burn (%)</th>
                             </tr>
                             </thead>
                             <tr th:each="s: ${stocks}">
@@ -52,11 +49,27 @@
                                 <td th:text="${s.volumeDelta}" />
                                 <td th:text="${s.minDelta}" />
                                 <td th:text="${s.maxDelta}" />
-                                <td th:text="${s.profitMargin}" />
-                                <td th:text="${s.debtRatio}" th:style="${s.flagDebtRatio} ?'color: red; font-weight: bolder;' : ''" />
+                            </tr>
+                        </table>
+                        <BR/>
+                        <BR/>
 
-                                <td th:if="${s.cashBurnRate} == -100" th:text="'NO CASH'" style="color: red; font-weight: bolder;" />
-                                <td th:unless="${s.cashBurnRate} == -100" th:text="(${s.cashBurnRate} == null OR ${s.cashBurnRate} > 0) ? '': ${s.cashBurnRateMag}" th:style="${s.flagBurnRate} ?'color: red; font-weight: bolder;' : ''"/>
+                        <div style="font-size: 1.5em; color: purple;">Financials</div><BR/>
+
+                        <table id="financials-table" th:if="${isNotMobile}">
+                            <thead>
+                            <tr id="financials-table-header">
+                                <th>Profit (%)</th>
+                                <th>Debt (%)</th>
+                                <th>Burn (%)</th>
+                            </tr>
+                            </thead>
+                            <tr>
+                                <td th:text="${profitMargin}" />
+                                <td th:text="${debtRatio}" th:style="${flagDebtRatio} ?'color: red; font-weight: bolder;' : ''" />
+
+                                <td th:if="${cashBurnRate} == -100" th:text="'NO CASH'" style="color: red; font-weight: bolder;" />
+                                <td th:unless="${cashBurnRate} == -100" th:text="(${cashBurnRate} == null OR ${cashBurnRate} > 0) ? '': ${cashBurnRateMag}" th:style="${flagBurnRate} ?'color: red; font-weight: bolder;' : ''"/>
                             </tr>
                         </table>
                         <div th:unless="${isNotMobile}">
