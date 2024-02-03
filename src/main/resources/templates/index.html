@@ -76,8 +76,7 @@
                                         <td>NO CASH</td>
                                     </tr>
                                     <tr th:unless="${s.cashBurnRate} == -100">
-                                        <td>Cash burn(%)</td>
-                                        <td th:text="${s.cashBurnRate}" />
+                                        <td>Cash burn(%)</td><td th:text="(${s.cashBurnRate} == null OR ${s.cashBurnRate} > 0) ? '': ${s.cashBurnRateMag}" th:style="${s.flagBurnRate} ?'color: red; font-weight: bolder;' : ''" />
                                     </tr>
 
                                     <tr><td>Volume Change(%)</td><td th:text="${s.volumeDelta}" /></tr>
