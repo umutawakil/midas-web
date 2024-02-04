@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Entity
-@Table(name="unsupported_ticker", schema = "midas")
+@Table(name="v_unsupported_ticker", schema = "helmet")
 class UnsupportedTicker(
     @Id
     @Column(name="ticker")

@@ -11,7 +11,7 @@ import kotlin.collections.HashMap
 import kotlin.math.abs
 
 @Entity
-@Table(name="v_stock_info", schema = "midas")
+@Table(name="v_stock_info", schema = "helmet")
 class StockInfo {
     @Embeddable
     private class StockInfoId(val ticker: String, val timeWindow: Int) : Serializable

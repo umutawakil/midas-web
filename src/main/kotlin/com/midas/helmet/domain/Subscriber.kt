@@ -43,7 +43,7 @@ class Subscriber {
             Subscriber.subscriberRepository  = subscriberRepository
             Subscriber.emailService          = emailService
 
-            for(s in subscriberRepository.findAll()) {
+            for (s in subscriberRepository.findAll()) {
                 subscribersByEmail[s.email] = s
                 subscribersByToken[s.confirmationToken] = s
             }
