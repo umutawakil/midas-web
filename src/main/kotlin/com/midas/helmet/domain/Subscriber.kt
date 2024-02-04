@@ -12,7 +12,7 @@ import java.net.URLEncoder
 import java.util.*
 
 @Entity
-@Table(name="subscriber")
+@Table(name="subscriber", schema = "helmet")
 class Subscriber {
     @Id
     @Column(name="id")
