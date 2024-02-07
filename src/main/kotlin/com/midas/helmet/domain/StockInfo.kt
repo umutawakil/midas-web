@@ -1,52 +1,56 @@
 package com.midas.helmet.domain
 
-import com.midas.helmet.repositories.StockInfoRepository
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.annotation.PostConstruct
 import jakarta.persistence.*
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import java.io.File
 import java.io.Serializable
 import java.util.*
-import kotlin.collections.HashMap
 import kotlin.math.abs
 
-@Entity
-@Table(name="v_stock_info", schema = "helmet")
+
 class StockInfo {
     @Embeddable
-    private class StockInfoId(val ticker: String, val timeWindow: Int) : Serializable
+    class StockInfoId(
+        val ticker: String,
+        val timeWindow: Int
+    ) : Serializable
 
     @EmbeddedId
-    private val id: StockInfoId
-    private val name: String?
-    private val windowDelta: Double
-    private val minDelta: Double
-    private val maxDelta: Double
-    private val volumeDelta: Double
-    private val profitMargin: Double?
+    var id: StockInfoId? = null
+    var name: String? = null
+    var windowDelta: Double? = null
+    var minDelta: Double? = null
+    var maxDelta: Double? = null
+    var volumeDelta: Double? = null
+    var profitMargin: Double? = null
     @Column(name = "debt_percentage")
-    private val debtPercentage: Double?
+    var debtPercentage: Double? = null
     @Column(name = "cfo_working_capital")
-    private val cashBurnRate: Double?
-    private val secSectorCode: Int?
-    private val otc: Boolean?
+    var cashBurnRate: Double? = null
+    var secSectorCode: Int? = null
+    var otc: Boolean? = null
 
     class StockInfoDto (
-        val ticker: String,
+        val ticker: String?,
         val name: String?,
-        val windowDelta: Double,
-        val minDelta: Double,
-        val maxDelta: Double,
-        val volumeDelta: Double,
+        val windowDelta: Double?,
+        val minDelta: Double?,
+        val maxDelta: Double?,
+        val volumeDelta: Double?,
         val profitMargin: Double?,
         val debtRatio: Double?,
-        val flagDebtRatio: Boolean,
+        val flagDebtRatio: Boolean?,
         val cashBurnRate: Double?,
         val cashBurnRateMag: Double?,
-        val showBurnRate: Boolean,
-        val flagBurnRate: Boolean,
-        val timeWindow: Int
+        val showBurnRate: Boolean?,
+        val flagBurnRate: Boolean?,
+        val timeWindow: Int?
     )
+
+    constructor() {}
 
     constructor(
         ticker: String,
@@ -76,24 +80,25 @@ class StockInfo {
     }
 
 
+    @Suppress("UNCHECKED_CAST")
     @Component
     class SpringAdapter(
-        @Autowired private val stockInfoRepository: StockInfoRepository
     ) {
         @PostConstruct
         fun init() {
-            StockInfo.stockInfoRepository = stockInfoRepository
+            val file = File("stock-info.json")
+            val objectMapper = ObjectMapper()
+            val results: List<StockInfo> = objectMapper.readValue(file, object : TypeReference<List<StockInfo>>() {}) as List<StockInfo>
 
-            val results = stockInfoRepository.findAll().toList()
             println("Loading stock info for ${results.size}")
-            for(r in results) {
+            for(r: StockInfo in results) {
                 /** Populate the map for querying individual tickers **/
-                val stockByWindow = stocksByTicker[r.id.ticker.lowercase()] ?: HashMap()
-                stockByWindow[r.id.timeWindow] = r
-                stocksByTicker[r.id.ticker.lowercase()] = stockByWindow
+                val stockByWindow = stocksByTicker[r.id!!.ticker.lowercase()] ?: HashMap()
+                stockByWindow[r.id!!.timeWindow]          = r
+                stocksByTicker[r.id!!.ticker.lowercase()] = stockByWindow
 
                 /** Populate the maps for browsing profitable stocks as well as profitable + unprofitable **/
-                if((r.profitMargin != null) && r.profitMargin > 0) {
+                if((r.profitMargin != null) && r.profitMargin!! > 0) {
                     profitableStocksOnly.add(r)
                     //println("A: ${r.id.ticker}")
                 } else {
@@ -110,7 +115,6 @@ class StockInfo {
 
 
     companion object {
-        private lateinit var stockInfoRepository: StockInfoRepository
         private val profitableStocksOnly: MutableSet<StockInfo> = HashSet()
         private val allStocks: MutableSet<StockInfo>            = HashSet()
         private val stocksByTicker: MutableMap<String, MutableMap<Int, StockInfo>> = HashMap()
@@ -155,9 +159,9 @@ class StockInfo {
                                         max: Double,
                                         orderDescending: Boolean) : List<StockInfo> {
             val results = set.filter {
-                (it.id.timeWindow == timeWindow) &&
-                (it.maxDelta <= max) &&
-                (it.minDelta >= min) &&
+                (it.id!!.timeWindow == timeWindow) &&
+                (it.maxDelta!! <= max) &&
+                (it.minDelta!! >= min) &&
                 (it.secSectorCode != 283) &&
                 (!("$it.secSectorCode".startsWith("38"))) &&
                 (!("$it.secSectorCode".startsWith("80"))) &&
@@ -193,7 +197,7 @@ class StockInfo {
             //Todo: The DTOafication of the domain data needs to be abstracted because its utilized in two methods
             return results.subList(start, endIndex).map { x ->
                 StockInfoDto(
-                    ticker          = x.id.ticker,
+                    ticker          = x.id!!.ticker,
                     name            = x.name,
                     windowDelta     = x.windowDelta,
                     minDelta        = x.minDelta,
@@ -201,11 +205,11 @@ class StockInfo {
                     volumeDelta     = x.volumeDelta,
                     profitMargin    = x.profitMargin,
                     debtRatio       = x.debtPercentage,
-                    flagDebtRatio   = x.debtPercentage != null && x.debtPercentage > 50.0,
+                    flagDebtRatio   = x.debtPercentage != null && x.debtPercentage!! > 50.0,
                     cashBurnRate    = x.cashBurnRate,
-                    cashBurnRateMag = if( x.cashBurnRate != null && x.cashBurnRate <0) { abs(x.cashBurnRate) } else { null },
-                    showBurnRate    = x.cashBurnRate != null && x.cashBurnRate < 0,
-                    flagBurnRate    = x.cashBurnRate != null && x.cashBurnRate <= -100,
+                    cashBurnRateMag = if( x.cashBurnRate != null && x.cashBurnRate!! <0) { abs(x.cashBurnRate!!) } else { null },
+                    showBurnRate    = x.cashBurnRate != null && x.cashBurnRate!! < 0,
+                    flagBurnRate    = x.cashBurnRate != null && x.cashBurnRate!! <= -100,
                     timeWindow      = timeWindow
                )
             }
@@ -226,7 +230,7 @@ class StockInfo {
 
              resultList.add(
                 StockInfoDto(
-                    ticker          = x.id.ticker,
+                    ticker          = x.id!!.ticker,
                     name            = x.name,
                     windowDelta     = x.windowDelta,
                     minDelta        = x.minDelta,
@@ -234,11 +238,11 @@ class StockInfo {
                     volumeDelta     = x.volumeDelta,
                     profitMargin    = x.profitMargin,
                     debtRatio       = x.debtPercentage,
-                    flagDebtRatio   = x.debtPercentage != null && x.debtPercentage > 50.0,
+                    flagDebtRatio   = x.debtPercentage != null && x.debtPercentage!! > 50.0,
                     cashBurnRate    = x.cashBurnRate,
-                    cashBurnRateMag = if( x.cashBurnRate != null && x.cashBurnRate <0) { abs(x.cashBurnRate) } else { null },
-                    showBurnRate    = x.cashBurnRate != null && x.cashBurnRate < 0,
-                    flagBurnRate    = x.cashBurnRate != null && x.cashBurnRate <= -100,
+                    cashBurnRateMag = if( x.cashBurnRate != null && x.cashBurnRate!! <0) { abs(x.cashBurnRate!!) } else { null },
+                    showBurnRate    = x.cashBurnRate != null && x.cashBurnRate!! < 0,
+                    flagBurnRate    = x.cashBurnRate != null && x.cashBurnRate!! <= -100,
                     timeWindow      = timeWindow
                 )
             )
