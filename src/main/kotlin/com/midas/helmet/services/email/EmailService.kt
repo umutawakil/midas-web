@@ -2,6 +2,7 @@ package com.midas.helmet.services.email
 
 import com.amazonaws.services.simpleemail.model.*
 import com.amazonaws.services.sqs.AmazonSQSAsync
+import com.amazonaws.services.sqs.AmazonSQSAsyncClient
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest
 import com.amazonaws.services.sqs.model.ReceiveMessageResult
 import com.amazonaws.services.sqs.model.SendMessageRequest
@@ -34,10 +35,15 @@ class EmailService(
     fun init() {
         workerUtilsAdapter.init()
 
-        sqsClient = WorkerUtils.buildAmazonSQSClientBuilder(
+        sqsClient = AmazonSQSAsyncClient.asyncBuilder().build()
+        /*sqsClient = WorkerUtils.buildAmazonSQSClientBuilder(
+            System.getenv("AWS_ACCESS_KEY_ID"),
+            System.getenv("AWS_SECRET_ACCESS_KEY")
+        ).build()*/
+        /*WorkerUtils.buildAmazonSQSClientBuilder(
             applicationProperties.awsAccessKey,
             applicationProperties.awsSecretKey
-        ).build()
+        ).build()*/
 
         WorkerUtils.runInLoop(
             threadName        = "EmailService",

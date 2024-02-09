@@ -3,6 +3,8 @@ package com.midas.helmet.services
 import com.amazonaws.services.simpleemail.model.*
 import com.midas.helmet.configuration.ApplicationProperties
 import com.midas.helmet.services.email.EmailClient
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -11,14 +13,15 @@ class LoggingService (
     @Autowired private val emailClient: EmailClient,
     @Autowired private val applicationProperties: ApplicationProperties
 ){
+    private val logger: Logger = LoggerFactory.getLogger(LoggingService::class.java);
     private val errorMap: MutableSet<String> = HashSet()
     fun log(message: String) {
-        println(message)
+        logger.info(message)
     }
 
     fun log(message: String, ex: Exception) {
-        println(message)
-        ex.printStackTrace()
+        logger.error(message, ex)
+
         if(errorMap.contains(message)) {
             return
         } else {
@@ -31,7 +34,7 @@ class LoggingService (
                     Body().withText(Content(ex.message))
                 )
             )
-            println(emailRequest.toString())
+            logger.info(emailRequest.toString())
             emailClient.send(
                 emailRequest
             )

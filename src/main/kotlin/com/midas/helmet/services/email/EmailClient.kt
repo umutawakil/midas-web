@@ -19,14 +19,15 @@ class EmailClient(
 
     @PostConstruct
     fun init() {
-        sesClient = AmazonSimpleEmailServiceAsyncClientBuilder.standard().
+        /*sesClient = AmazonSimpleEmailServiceAsyncClientBuilder.standard().
         withCredentials(
             AWSStaticCredentialsProvider(
                 BasicAWSCredentials(
-                    applicationProperties.awsAccessKey, applicationProperties.awsSecretKey
+                    System.getenv("AWS_ACCESS_KEY_ID"), System.getenv("AWS_SECRET_ACCESS_KEY")
                 )
             )
-        ).build()
+        ).build()*/
+        sesClient = AmazonSimpleEmailServiceAsyncClientBuilder.standard().build()
     }
 
     fun send(sendEmailRequest: SendEmailRequest) {

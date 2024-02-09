@@ -112,6 +112,85 @@
         }
       }
     },
+    "DynamoDBPolicy" : {
+      "DependsOn" : ["InstanceRole"],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": {"Fn::Join" : ["", ["dynamodb-policy-", {"Ref": "Environment"}]]},
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:GetItem",
+                "dynamodb:Scan*",
+                "dynamodb:Query*",
+                "dynamodb:UpdateItem"
+              ],
+              "Resource": "arn:aws:dynamodb:*:*:table/*"
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "InstanceRole"
+          }
+        ]
+      }
+    },
+    "EmailSendPolicy": {
+      "DependsOn" : ["InstanceRole"],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": {"Fn::Join": ["",["instance-email-send-policy-",{"Ref": "Environment"}]]},
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ses:SendEmail",
+                "ses:SendRawEmail"
+              ],
+              "Resource": "*"
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "InstanceRole"
+          }
+        ]
+      }
+    },
+    "EmailQueuePolicy": {
+      "DependsOn" : ["InstanceRole"],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": {"Fn::Join": ["",["email-queue-policy-",{"Ref": "Environment"}]]},
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "sqs:SendMessage",
+                "sqs:ReceiveMessage",
+                "sqs:DeleteMessage"
+              ],
+              "Resource": "*"
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "InstanceRole"
+          }
+        ]
+      }
+    },
     "ElbLogPolicy": {
       "Description": "Allows EC2 instances ability to write log files to deployment bucket",
       "Type": "AWS::S3::BucketPolicy",
@@ -462,6 +541,10 @@
     "ChangeId": {
       "Description": "This is the source control commit id of the last change on this project. Any time this value is changed the userData section of this stack will be recreated.",
       "Value": {"Ref": "ChangeId"}
+    },
+    "DynamoDBPolicy" : {
+      "Description" : "IAM policy for dynamoDB actions",
+      "Value" : {"Ref" : "DynamoDBPolicy"}
     }
   }
 }

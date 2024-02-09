@@ -6,7 +6,11 @@ import com.midas.helmet.domain.Subscriber
 import com.midas.helmet.domain.UnsupportedTicker
 import com.midas.helmet.domain.value.EmailAddress
 import com.midas.helmet.services.LoggingService
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.ui.set
@@ -32,6 +36,7 @@ class HomeController(
         @RequestParam(name="time_window", required = false)  t: Int?,
         @RequestParam(name="volatility_limit", required = false)  v: Int?
     ): String {
+        loggingService.log("Homepage requested")
         if((ticker != null) && ticker.isNotEmpty()) { /** TODO: This hack exists because the same form for search/filter is used to get a specific ticker **/
             return "redirect:/ticker/$ticker"
         }
@@ -86,6 +91,7 @@ class HomeController(
         model: Model,
         @PathVariable(name="t", required = true) ticker: String
     ): String {
+        loggingService.log("Ticker info requested")
         val stocks            = StockInfo.queryTickerWindows(ticker)
         model["stocks"]       = stocks
         model["unsupported"]  = if (UnsupportedTicker.isNotSupported(ticker)) { true } else { null }
@@ -111,6 +117,7 @@ class HomeController(
         @RequestParam(name="email", required = true) email: String,
         @RequestParam(name="time_zone_offset", required = true) timeZoneOffset: String
     ): String {
+        loggingService.log("Newsletter subscription request for : $email")
         Subscriber.sendConfirmationEmail(
             email          = EmailAddress(email),
             timeZoneOffset = timeZoneOffset
@@ -119,14 +126,32 @@ class HomeController(
     }
 
     @GetMapping("/confirm-email/{token}")
-    @ResponseBody
     fun confirmEmailAddress(
         model: Model,
-        @PathVariable(name="token", required = true) token: String
-    ): String {
-        if(Subscriber.confirmEmailAddress(token = token)) {
-            return "Email address confirmed!"
+        @PathVariable(name="token", required = true) token: String,
+        response: HttpServletResponse
+    ) : String  {
+        if (Subscriber.confirmEmailAddress(token = token)) {
+            loggingService.log("New email confirmation!!")
+            return "standard-pages/email-confirmed"
+            //response.writer.print("Email address confirmed!")
+        } else {
+            return "standard-pages/invalid-email-confirmation-link"
+            //response.writer.print("Invalid or expired link.")
         }
-        return "Invalid or expired link."
+        //return ResponseEntity<String>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/error")
+    fun showError(
+        model: Model,
+        response: HttpServletResponse
+    ) : String {
+        if (response.status == 404) {
+            model["message"] = "Unknown page"
+        } else {
+            model["message"] = "An unknown error has occurred. Let us know on Twitter @BoipApp"
+        }
+        return "/error.html"
     }
 }

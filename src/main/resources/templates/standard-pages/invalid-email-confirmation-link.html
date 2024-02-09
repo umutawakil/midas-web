@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/main.html}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <head>
+        <link rel="stylesheet" href="/app.css">
+    </head>
+    <body>
+    <th:block layout:fragment="content">
+        <div id="slogan">
+            <H1 id="main-icon">Expired link.</H1>
+        </div>
+
+        <div id="main-center-div">
+            <div style="display: inline-block">
+                This link has already been used or is invalid.
+            </div>
+        </div>
+    </th:block>
+
+    </body>
+</html>

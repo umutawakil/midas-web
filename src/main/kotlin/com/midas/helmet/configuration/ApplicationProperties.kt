@@ -9,8 +9,8 @@ class ApplicationProperties {
     val defaultVolatilityLimit: Int
     val defaultTimeWindow: Int
     
-    val awsAccessKey: String
-    val awsSecretKey: String
+    /*val awsAccessKey: String
+    val awsSecretKey: String*/
     val emailQueuePollInterval: Long
     val delayBetweenEmailSend: Long
     val emailQueueUrl: String
@@ -23,8 +23,8 @@ class ApplicationProperties {
         defaultVolatilityLimit: Int,
         defaultTimeWindow: Int,
 
-         awsAccessKey: String,
-         awsSecretKey: String,
+         /*awsAccessKey: String,
+         awsSecretKey: String,*/
          emailQueuePollInterval: Long,
          delayBetweenEmailSend: Long,
          emailQueueUrl: String,
@@ -37,8 +37,8 @@ class ApplicationProperties {
         this.defaultVolatilityLimit = defaultVolatilityLimit
         this.defaultTimeWindow      = defaultTimeWindow
 
-        this.awsAccessKey           = awsAccessKey
-        this.awsSecretKey           = awsSecretKey
+        /*this.awsAccessKey           = awsAccessKey
+        this.awsSecretKey           = awsSecretKey*/
         this.emailQueuePollInterval = emailQueuePollInterval
         this.delayBetweenEmailSend  = delayBetweenEmailSend
         this.emailQueueUrl          = emailQueueUrl

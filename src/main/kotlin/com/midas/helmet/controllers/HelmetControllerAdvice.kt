@@ -1,5 +1,6 @@
 package com.midas.helmet.controllers
 
+import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException
 import com.midas.helmet.services.LoggingService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.servlet.resource.NoResourceFoundException
 
 
 @ControllerAdvice
@@ -39,13 +41,16 @@ class HelmetControllerAdvice(
     @ExceptionHandler(Exception::class)
     fun handle(
         ex: Exception,
-        request: HttpServletRequest?, response: HttpServletResponse
-    ): ResponseEntity<Any?>? {
-        loggingService.log(message="Unhandled error occurred", ex = ex )
-
-        return if (ex is NullPointerException) {
-            ResponseEntity<Any?>(HttpStatus.BAD_REQUEST)
-        } else ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build<Any>()
+        request: HttpServletRequest?,
+        response: HttpServletResponse
+    ) {
+        if (ex !is NoResourceFoundException) {
+            loggingService.log(
+                message = "Unhandled error occurred: (HTTP: ${response.status})",
+                ex      = ex
+            )
+        }
+        response.sendRedirect("/error")
     }
 
 

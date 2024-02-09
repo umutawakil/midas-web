@@ -16,6 +16,7 @@ preDeploymentBucket="bloip-pre-deployment-${environment}"
 aws s3 cp s3://${preDeploymentBucket} s3://${deploymentBucket} --recursive
 
 #build application
+${localProjectFolder}/gradlew clean
 ${localProjectFolder}/gradlew build -x test
 
 #push the key deployment files to the deployment bucket. The EC2 instance the app will run on will initialize itself

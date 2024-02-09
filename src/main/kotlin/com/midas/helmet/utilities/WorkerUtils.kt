@@ -34,7 +34,7 @@ class WorkerUtils {
     companion object {
         private lateinit var loggingService: LoggingService
         fun buildAmazonSQSClientBuilder(awsUploadAccessKey: String, awsUploadSecretKey: String) : AmazonSQSAsyncClientBuilder {
-            println("Building SQS client....")
+            loggingService.log("Building SQS client....")
             return AmazonSQSAsyncClient.asyncBuilder().withCredentials(
                 AWSStaticCredentialsProvider(
                     BasicAWSCredentials(

@@ -25,7 +25,7 @@
             </div>
             <span id="stash" style="display: none" th:attr="ticker=${ticker},timeWindow=${timeWindow},profitability=${profitability}, volatilityLimit=${volatilityLimit}, orderDescending=${orderDescending}"></span>
             <div id="main-center-div">
-                    <div th:include="fragments/search-filter.html :: search-filter"></div>
+                    <div th:insert="~{fragments/search-filter.html :: search-filter}"></div>
                     <BR/>
 
                     <BR/>

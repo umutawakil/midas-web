@@ -78,7 +78,7 @@
                             </div>
                         </th:block>
 
-                        <th:block th:if="${cashBurnRate} < -100">
+                        <th:block th:if="(${cashBurnRate} != null) AND (${cashBurnRate} < -100)">
                             <BR/>
                             <BR/>
                             <div style="width: 50%; display: inline-block; margin-bottom: 30px;">

@@ -2,8 +2,9 @@ package com.midas.helmet.domain
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.midas.helmet.services.LoggingService
 import jakarta.annotation.PostConstruct
-import jakarta.persistence.*
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.io.File
 import java.io.Serializable
@@ -12,13 +13,18 @@ import kotlin.math.abs
 
 
 class StockInfo {
-    @Embeddable
-    class StockInfoId(
-        val ticker: String,
-        val timeWindow: Int
-    ) : Serializable
+    class StockInfoId : Serializable {
+        var ticker: String? = null
+        var timeWindow: Int? = null
 
-    @EmbeddedId
+        constructor(ticker: String?, timeWindow: Int?) {
+            this.ticker     = ticker
+            this.timeWindow = timeWindow
+        }
+
+        constructor()
+    }
+
     var id: StockInfoId? = null
     var name: String? = null
     var windowDelta: Double? = null
@@ -26,9 +32,7 @@ class StockInfo {
     var maxDelta: Double? = null
     var volumeDelta: Double? = null
     var profitMargin: Double? = null
-    @Column(name = "debt_percentage")
     var debtPercentage: Double? = null
-    @Column(name = "cfo_working_capital")
     var cashBurnRate: Double? = null
     var secSectorCode: Int? = null
     var otc: Boolean? = null
@@ -83,6 +87,7 @@ class StockInfo {
     @Suppress("UNCHECKED_CAST")
     @Component
     class SpringAdapter(
+        @Autowired private val loggingService: LoggingService
     ) {
         @PostConstruct
         fun init() {
@@ -90,25 +95,23 @@ class StockInfo {
             val objectMapper = ObjectMapper()
             val results: List<StockInfo> = objectMapper.readValue(file, object : TypeReference<List<StockInfo>>() {}) as List<StockInfo>
 
-            println("Loading stock info for ${results.size}")
+            loggingService.log("Loading stock info for ${results.size}")
             for(r: StockInfo in results) {
                 /** Populate the map for querying individual tickers **/
-                val stockByWindow = stocksByTicker[r.id!!.ticker.lowercase()] ?: HashMap()
-                stockByWindow[r.id!!.timeWindow]          = r
-                stocksByTicker[r.id!!.ticker.lowercase()] = stockByWindow
+                val stockByWindow = stocksByTicker[r.id!!.ticker!!.lowercase()] ?: HashMap()
+                stockByWindow[r.id!!.timeWindow!!]          = r
+                stocksByTicker[r.id!!.ticker!!.lowercase()] = stockByWindow
 
                 /** Populate the maps for browsing profitable stocks as well as profitable + unprofitable **/
                 if((r.profitMargin != null) && r.profitMargin!! > 0) {
                     profitableStocksOnly.add(r)
-                    //println("A: ${r.id.ticker}")
                 } else {
                     allStocks.add(r)
-                    //println("B: ${r.id.ticker}")
                 }
             }
-            println("Stock info loaded.")
-            println("Profitable stock records: " + profitableStocksOnly.size)
-            println("All records: " + allStocks.size)
+            loggingService.log("Stock info loaded.")
+            loggingService.log("Profitable stock records: " + profitableStocksOnly.size)
+            loggingService.log("All records: " + allStocks.size)
         }
 
     }

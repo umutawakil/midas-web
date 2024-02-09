@@ -4,6 +4,9 @@ build/*
 .idea
 .idea/*
 
+stock-info.json
+unsupported-tickers.json
+
 *.DS_store
 
 # Compiled class file
