@@ -105,9 +105,9 @@ class StockInfo {
                 /** Populate the maps for browsing profitable stocks as well as profitable + unprofitable **/
                 if((r.profitMargin != null) && r.profitMargin!! > 0) {
                     profitableStocksOnly.add(r)
-                } else {
-                    allStocks.add(r)
                 }
+                allStocks.add(r)
+
             }
             loggingService.log("Stock info loaded.")
             loggingService.log("Profitable stock records: " + profitableStocksOnly.size)
