@@ -220,8 +220,11 @@ class StockInfo {
 
         fun queryTickerWindows(ticker: String) : List<StockInfoDto> {
             return timeWindows.map {
-                queryTicker(ticker = ticker, timeWindow = it)[0]
-            }.sortedBy {it.timeWindow}
+                val x = queryTicker(ticker = ticker, timeWindow = it)
+                if(x.isEmpty()) null
+                else x[0]
+                //queryTicker(ticker = ticker, timeWindow = it)[0]
+            }.filterNotNull().sortedBy {it.timeWindow}
         }
 
         fun queryTicker(

@@ -35,32 +35,30 @@
                             <thead>
                                 <tr id="results-table-header">
                                     <th></th>
-                                    <th>Total Gain (%)</th>
-                                    <th>Worst Day (%)</th>
-                                    <th>Best Day (%)</th>
+                                    <th>Gain(%)</th>
+                                    <!--<th>VolumeΔ(%)</th>-->
+                                    <th>Worst Day(%)</th>
+                                    <th>Best Day(%)</th>
                                     <th>Profit (%)</th>
+                                    <th>Cash Burn(%)</th>
                                     <th>Debt (%)</th>
-                                    <th>Burn (%)</th>
-                                    <th>VolumeΔ (%)</th>
                                 </tr>
                             </thead>
                             <tr th:each="s: ${stocks}">
                                 <td><a th:href="${'/ticker/' +s.ticker}" th:text="${s.ticker}"/></td>
                                 <td th:text="${s.windowDelta}" />
-                                <td th:text="${s.minDelta}" />
+                                <td th:text="${s.minDelta}"/>
                                 <td th:text="${s.maxDelta}" />
-                                <td th:text="${s.profitMargin}" />
-                                <td th:text="${s.debtRatio}" th:style="${s.flagDebtRatio} ?'color: red; font-weight: bolder;' : ''" />
-
+                                <td th:text="${s.profitMargin}"/>
+                                <!--<td th:text="${s.volumeDelta}" th:style="${s.volumeDelta < 0} ?'color: red; font-weight: bolder;' : ''"/>-->
                                 <td th:if="${s.cashBurnRate} == -100" th:text="'NO CASH'" style="color: red; font-weight: bolder;" />
                                 <td th:unless="${s.cashBurnRate} == -100" th:text="(${s.cashBurnRate} == null OR ${s.cashBurnRate} > 0) ? '': ${s.cashBurnRateMag}" th:style="${s.flagBurnRate} ?'color: red; font-weight: bolder;' : ''"/>
-
-                                <td th:text="${s.volumeDelta}" />
+                                <td th:text="${s.debtRatio}" th:style="${s.flagDebtRatio} ?'color: red; font-weight: bolder;' : ''" />
                             </tr>
                         </table>
-                        <div th:unless="${isNotMobile}">
+                        <div th:unless="${isNotMobile}" style="text-align: center;">
                             <HR class="mobile-rule"/>
-                            <div th:each="s: ${stocks}">
+                            <div th:each="s: ${stocks}" style="text-align: center; display: inline-block;">
                                 <table class="results-table-mobile">
                                     <tr><td>Ticker</td><td><a th:href="${'/ticker/' + s.ticker}" th:text="${s.ticker}"></a></td></tr>
                                     <tr><td>Total Gain (%)</td><td th:text="${s.windowDelta}" /></tr>
@@ -85,7 +83,6 @@
                                 <HR class="mobile-rule"/>
                             </div>
                         </div>
-                        <span id="notFound" style="display: none" th:if="${notFound}"/>
                     </div>
 
                     <div id="pagination-buttons">

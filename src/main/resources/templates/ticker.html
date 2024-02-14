@@ -6,9 +6,12 @@
             function init() {
                 if (document.getElementById("unsupported-container")) {
                     alert("Sorry! That stock is currently not providing us with standard US accounting information and is most likely a foreign company. We are working on integrating them. Please shoot us a message on Twitter telling us to hurry up!!!");
+                    history.back();
                 }
                 if (document.getElementById("notFound")) {
-                    alert("No stock with that symbol can be found. Type the stock ticker or symbol (not the company name). Check your spelling. Send us a message on Twitter if you are sure you spelt the ticker correctly.")
+                    document.getElementById("main-center-div").hidden = true;
+                    alert("No stock with that symbol can be found. Type the stock ticker or symbol (not the company name). Check your spelling. Send us a message on Twitter if you are sure you spelt the ticker correctly.");
+                    history.back();
                 }
             }
         </script>
@@ -20,23 +23,24 @@
             </div>
 
             <div id="main-center-div">
-                <H2 th:text="${ticker}"></H2>
+                <H2 th:text="${name}" th:if="${name != null}"></H2>
+                <H2 th:text="${ticker}" th:unless="${name != null}"></H2>
+
                 <div style="margin-top: 20px; margin-bottom: 15px;">
                     <button onclick="history.back();" style="cursor:pointer"> < </button>
                 </div>
 
                 <div>
-                    <div id="unsupported-container" th:if="${unsupported}">
-                    </div>
+                    <div id="unsupported-container" style="display: none;" th:if="${unsupported}"></div>
                     <th:block th:unless="${unsupported}">
                         <table id="results-table">
                             <thead>
                             <tr id="results-table-header">
                                 <th>Days</th>
-                                <th>Gain (%)</th>
-                                <th>VolumeΔ (%)</th>
-                                <th>High (%)</th>
-                                <th>Low (%)</th>
+                                <th>PriceΔ</th>
+                                <th>VΔ</th>
+                                <th>H</th>
+                                <th>L</th>
                             </tr>
                             </thead>
                             <tr th:each="s: ${stocks}">
@@ -87,6 +91,8 @@
                             </div>
                         </th:block>
 
+                        <span id="notFound" style="display: none" th:if="${notFound}"/>
+
                         <!--<div th:unless="${isNotMobile}">
                             <HR class="mobile-rule"/>
                             <div th:each="s: ${stocks}">
@@ -114,7 +120,7 @@
                                 <HR class="mobile-rule"/>
                             </div>
                         </div>-->
-                        <span id="notFound" style="display: none" th:if="${notFound}"/>
+                        <!--<span id="notFound" style="display: none" th:if="${notFound}"/>-->
                     </th:block>
                 </div>
             <HR id="ticker-rule" style="width: 50%; display: inline-block"/>

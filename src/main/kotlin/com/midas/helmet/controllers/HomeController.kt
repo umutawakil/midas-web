@@ -94,9 +94,13 @@ class HomeController(
         loggingService.log("Ticker info requested")
         val stocks            = StockInfo.queryTickerWindows(ticker)
         model["stocks"]       = stocks
-        model["unsupported"]  = if (UnsupportedTicker.isNotSupported(ticker)) { true } else { null }
-        model["notFound"]     = if (stocks.isEmpty()) { true } else { null }
+        model["unsupported"]  = if (UnsupportedTicker.isNotSupported(ticker)) { true } else { false }
+        model["notFound"]     = if (stocks.isEmpty()) { true } else { false }
         model["ticker"]       = ticker
+
+        if(stocks.isNotEmpty() && stocks[0].name != null) {
+            model["name"] = stocks[0].name
+        }
 
         if (stocks.isNotEmpty()) {
             model["profitMargin"]    = stocks[0].profitMargin
