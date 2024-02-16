@@ -58,28 +58,26 @@
                         </table>
                         <div th:unless="${isNotMobile}" style="text-align: center;">
                             <HR class="mobile-rule"/>
-                            <div th:each="s: ${stocks}" style="text-align: center; display: inline-block;">
-                                <table class="results-table-mobile">
-                                    <tr><td>Ticker</td><td><a th:href="${'/ticker/' + s.ticker}" th:text="${s.ticker}"></a></td></tr>
-                                    <tr><td>Total Gain (%)</td><td th:text="${s.windowDelta}" /></tr>
-                                    <tr><td>Worst Day (%)</td><td th:text="${s.minDelta}" /></tr>
-                                    <tr><td>Best Day (%)</td><td th:text="${s.maxDelta}" /></tr>
-                                    <tr><td>Profit Margin (%)</td><td th:text="${s.profitMargin}" /></tr>
+                            <div th:each="s: ${stocks}" style="text-align: center; display: inline-block;" class="results-table-mobile">
+                                <div><a th:href="${'/ticker/' + s.ticker}" th:text="${s.ticker}"></a></div>
+                                <div>Total Gain: <span th:text="${s.windowDelta}" /><span>%</span></div>
+                                <div>Worst Day: <span th:text="${s.minDelta}" /><span>%</span></div>
+                                <div>Best Day: <span th:text="${s.maxDelta}" /><span>%</span></div>
+                                <th:block th:if="${s.profitMargin} != null">
+                                <div>Profit Margin: <span th:text="${s.profitMargin}" /><span>%</span></div>
+                                    <div style="color: red; font-weight: bolder;" th:if="${s.flagDebtRatio}">Debt: <span th:text="${s.debtRatio}"  /><span>%</span></div>
+                                    <div th:unless="${s.flagDebtRatio}">Debt: <span th:text="${s.debtRatio}"/><span th:if="${s.debtRatio != null}">%</span></div>
 
-                                    <tr style="color: red; font-weight: bolder;" th:if="${s.flagDebtRatio}"><td>Debt(%)</td><td th:text="${s.debtRatio}"  /></tr>
-                                    <tr th:unless="${s.flagDebtRatio}"><td>Debt(%)</td><td th:text="${s.debtRatio}"/></tr>
-
-                                    <tr th:if="${s.cashBurnRate} == -100" style="color: red; font-weight: bolder;">
-                                        <td>Cash burn(%)</td>
-                                        <td>NO CASH</td>
-                                    </tr>
-                                    <tr th:unless="${s.cashBurnRate} == -100">
-                                        <td>Cash burn(%)</td><td th:text="(${s.cashBurnRate} == null OR ${s.cashBurnRate} > 0) ? '': ${s.cashBurnRateMag}" th:style="${s.flagBurnRate} ?'color: red; font-weight: bolder;' : ''" />
-                                    </tr>
-
-                                    <tr><td>Volume Change(%)</td><td th:text="${s.volumeDelta}" /></tr>
-                                </table>
-                                <BR/>
+                                    <div th:if="${s.cashBurnRate} == -100" style="color: red; font-weight: bolder;">
+                                        Cash burn: NO CASH
+                                    </div>
+                                    <div th:unless="${s.cashBurnRate} == -100">
+                                        <th:block th:if="${s.cashBurnRate != null && s.cashBurnRate < 0}">
+                                            Cash burn: <span th:text="(${s.cashBurnRate} == null OR ${s.cashBurnRate} > 0) ? '': ${s.cashBurnRateMag}" th:style="${s.flagBurnRate} ?'color: red; font-weight: bolder;' : ''" />
+                                            <span>%</span>
+                                        </th:block>
+                                    </div>
+                                </th:block>
                                 <HR class="mobile-rule"/>
                             </div>
                         </div>
