@@ -123,7 +123,6 @@ class StockInfo {
         private val stocksByTicker: MutableMap<String, MutableMap<Int, StockInfo>> = HashMap()
         private val timeWindows: List<Int> = listOf(3, 5, 10, 20, 40, 60)
 
-        //How do you paginate this since you have to start and stop?
         fun queryProfitableStocks(start: Int,size: Int, timeWindow: Int, min: Double, max: Double, orderDescending: Boolean): List<StockInfoDto> {
             return query(
                 start           = start,
@@ -167,14 +166,14 @@ class StockInfo {
                 (it.minDelta!! >= min) &&
 
                 (
+                        it.secSectorCode == null ||
                         (
-                            it.secSectorCode != null &&
                             (it.secSectorCode != 283) &&
                             (!("$it.secSectorCode".startsWith("38"))) &&
                             (!("$it.secSectorCode".startsWith("80"))) &&
                             (it.otc == false)
-                        ) ||
-                        it.secSectorCode == null
+                        )
+
                 )
             }
             if(orderDescending) {
