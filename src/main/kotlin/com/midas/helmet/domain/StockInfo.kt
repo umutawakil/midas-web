@@ -165,10 +165,17 @@ class StockInfo {
                 (it.id!!.timeWindow == timeWindow) &&
                 (it.maxDelta!! <= max) &&
                 (it.minDelta!! >= min) &&
-                (it.secSectorCode != 283) &&
-                (!("$it.secSectorCode".startsWith("38"))) &&
-                (!("$it.secSectorCode".startsWith("80"))) &&
-                (it.otc == false)
+
+                (
+                        (
+                            it.secSectorCode != null &&
+                            (it.secSectorCode != 283) &&
+                            (!("$it.secSectorCode".startsWith("38"))) &&
+                            (!("$it.secSectorCode".startsWith("80"))) &&
+                            (it.otc == false)
+                        ) ||
+                        it.secSectorCode == null
+                )
             }
             if(orderDescending) {
                 return results.sortedByDescending { it.windowDelta }
