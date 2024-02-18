@@ -83,8 +83,6 @@ class StockInfo {
         this.otc            = otc
     }
 
-
-    @Suppress("UNCHECKED_CAST")
     @Component
     class SpringAdapter(
         @Autowired private val loggingService: LoggingService
@@ -123,26 +121,28 @@ class StockInfo {
         private val stocksByTicker: MutableMap<String, MutableMap<Int, StockInfo>> = HashMap()
         private val timeWindows: List<Int> = listOf(3, 5, 10, 20, 40, 60)
 
-        fun queryProfitableStocks(start: Int,size: Int, timeWindow: Int, min: Double, max: Double, orderDescending: Boolean): List<StockInfoDto> {
+        fun queryProfitableStocks(start: Int,size: Int, timeWindow: Int, min: Double, max: Double, orderDescending: Boolean, healthcareBiotech: Boolean): List<StockInfoDto> {
             return query(
-                start           = start,
-                size            = size,
-                timeWindow      = timeWindow,
-                set             = profitableStocksOnly,
-                min             = min,
-                max             = max,
-                orderDescending = orderDescending
+                start             = start,
+                size              = size,
+                timeWindow        = timeWindow,
+                set               = profitableStocksOnly,
+                min               = min,
+                max               = max,
+                orderDescending   = orderDescending,
+                healthcareBiotech = healthcareBiotech
             )
         }
-        fun queryAllStocks(start: Int,size: Int, timeWindow: Int, min: Double, max: Double, orderDescending: Boolean): List<StockInfoDto> {
+        fun queryAllStocks(start: Int,size: Int, timeWindow: Int, min: Double, max: Double, orderDescending: Boolean, healthcareBiotech: Boolean): List<StockInfoDto> {
             return query(
-                start           = start,
-                size            = size,
-                timeWindow      = timeWindow,
-                set             = allStocks,
-                min             = min,
-                max             = max,
-                orderDescending = orderDescending
+                start             = start,
+                size              = size,
+                timeWindow        = timeWindow,
+                set               = allStocks,
+                min               = min,
+                max               = max,
+                orderDescending   = orderDescending,
+                healthcareBiotech = healthcareBiotech
             )
         }
 
@@ -159,7 +159,9 @@ class StockInfo {
                                         set: Set<StockInfo>,
                                         min: Double,
                                         max: Double,
-                                        orderDescending: Boolean) : List<StockInfo> {
+                                        orderDescending: Boolean,
+                                        healthcareBiotech: Boolean
+        ) : List<StockInfo> {
             val results = set.filter {
                 (it.id!!.timeWindow == timeWindow) &&
                 (it.maxDelta!! <= max) &&
@@ -168,9 +170,8 @@ class StockInfo {
                 (
                         it.secSectorCode == null ||
                         (
-                            (it.secSectorCode != 283) &&
-                            (!("$it.secSectorCode".startsWith("38"))) &&
-                            (!("$it.secSectorCode".startsWith("80"))) &&
+                            (healthcareBiotech || ((it.secSectorCode != 283) && (!("$it.secSectorCode".startsWith("38"))) && (!("$it.secSectorCode".startsWith("80"))))) &&
+
                             (it.otc == false)
                         )
 
@@ -189,14 +190,16 @@ class StockInfo {
                 set: Set<StockInfo>,
                 min: Double,
                 max: Double,
-                orderDescending: Boolean
+                orderDescending: Boolean,
+                healthcareBiotech: Boolean
         ) : List<StockInfoDto> {
             val results: List<StockInfo> = filterStandardQuery(
-                timeWindow      = timeWindow,
-                min             = min,
-                max             = max,
-                set             = set,
-                orderDescending = orderDescending
+                timeWindow        = timeWindow,
+                min               = min,
+                max               = max,
+                set               = set,
+                orderDescending   = orderDescending,
+                healthcareBiotech = healthcareBiotech
             )
 
             var endIndex = start + size

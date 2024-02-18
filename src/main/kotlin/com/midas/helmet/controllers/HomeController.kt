@@ -32,6 +32,7 @@ class HomeController(
         @RequestParam(name="ticker", required = false) ticker: String?,
         @RequestParam(name="start", required = false) s: Int?,
         @RequestParam(name="profitability", required = false) p: Boolean?,
+        @RequestParam(name="healthcare_bio", required = false) h: Boolean?,
         @RequestParam(name="order_descending", required = false) o: Boolean?,
         @RequestParam(name="time_window", required = false)  t: Int?,
         @RequestParam(name="volatility_limit", required = false)  v: Int?
@@ -41,29 +42,32 @@ class HomeController(
             return "redirect:/ticker/$ticker"
         }
 
-        val start           = s?: 0
-        val profitability   = p ?: false
-        val orderDescending = o ?: true
-        val timeWindow      = t ?: applicationProperties.defaultTimeWindow
-        val volatilityLimit = v ?: applicationProperties.defaultVolatilityLimit
+        val start             = s?: 0
+        val profitability     = p ?: false
+        val healthcareBiotech = h ?: false
+        val orderDescending   = o ?: true
+        val timeWindow        = t ?: applicationProperties.defaultTimeWindow
+        val volatilityLimit   = v ?: applicationProperties.defaultVolatilityLimit
 
         val results: List<StockInfo.StockInfoDto> = if(profitability) {
             StockInfo.queryProfitableStocks(
-                start           = start,
-                size            = applicationProperties.standardResultsPerPage + 1,
-                timeWindow      = timeWindow,
-                min             = (-1.0)*abs(volatilityLimit),
-                max             = 1.0*abs(volatilityLimit),
-                orderDescending = orderDescending
+                start             = start,
+                size              = applicationProperties.standardResultsPerPage + 1,
+                timeWindow        = timeWindow,
+                min               = (-1.0)*abs(volatilityLimit),
+                max               = 1.0*abs(volatilityLimit),
+                orderDescending   = orderDescending,
+                healthcareBiotech = healthcareBiotech
             )
         } else {
             StockInfo.queryAllStocks(
-                start           = start,
-                size            = applicationProperties.standardResultsPerPage + 1,
-                timeWindow      = timeWindow,
-                min             = (-1.0)*abs(volatilityLimit),
-                max             = 1.0*abs(volatilityLimit),
-                orderDescending = orderDescending
+                start             = start,
+                size              = applicationProperties.standardResultsPerPage + 1,
+                timeWindow        = timeWindow,
+                min               = (-1.0)*abs(volatilityLimit),
+                max               = 1.0*abs(volatilityLimit),
+                orderDescending   = orderDescending,
+                healthcareBiotech = healthcareBiotech
             )
         }
 
@@ -78,10 +82,11 @@ class HomeController(
             model["back"] = start - applicationProperties.standardResultsPerPage
         }
 
-        model["timeWindow"]      = timeWindow
-        model["volatilityLimit"] = volatilityLimit
-        model["profitability"]   = if(profitability) { 1 } else { 0}
-        model["orderDescending"] = if(orderDescending) { 1 } else { 0}
+        model["timeWindow"]        = timeWindow
+        model["volatilityLimit"]   = volatilityLimit
+        model["profitability"]     = if(profitability) { 1 } else { 0}
+        model["orderDescending"]   = if(orderDescending) { 1 } else { 0}
+        model["healthcareBiotech"] = if(healthcareBiotech) { 1 } else { 0}
 
         return "index"
     }

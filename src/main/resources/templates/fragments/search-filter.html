@@ -16,6 +16,13 @@
             </div>
 
             <div class="form-group">
+                <select id="healthcare_bio" name ="healthcare_bio" th:class ="${healthcareBiotech} ? 'form-select select-control' : 'form-select select-control-mobile'" style="font-size: 1.5em; width: 320px;">
+                    <option value = "1">Include healthcare/Bio-tech</option>
+                    <option value = "0">No healthcare/Bio-tech</option>
+                </select>
+            </div>
+
+            <div class="form-group">
                 <select id="order_descending" name = "order_descending" th:class ="${orderDescending} ? 'form-select select-control' : 'form-select select-control-mobile'" style="font-size: 1.5em; width: 320px;">
                     <option value = "1">Increasing first (Bulls)</option>
                     <option value = "0">Decreasing first (Bears)</option>

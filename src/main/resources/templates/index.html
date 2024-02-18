@@ -4,17 +4,25 @@
         <link rel="stylesheet" href="/app.css">
         <script type="text/javascript">
             function init() {
-                var stash           = document.getElementById("stash");
-                var profitability   = stash.getAttribute("profitability");
-                var timeWindow      = stash.getAttribute("timeWindow");
-                var volatilityLimit = stash.getAttribute("volatilityLimit");
-                var orderDescending = stash.getAttribute("orderDescending");
+                var stash             = document.getElementById("stash");
+                var profitability     = stash.getAttribute("profitability");
+                var timeWindow        = stash.getAttribute("timeWindow");
+                var volatilityLimit   = stash.getAttribute("volatilityLimit");
+                var orderDescending   = stash.getAttribute("orderDescending");
+                var healthcareBiotech = stash.getAttribute("healthcareBiotech");
 
                 document.getElementById("profitability").value    = profitability;
                 document.getElementById("time_window").value      = timeWindow;
                 document.getElementById("volatility_limit").value = volatilityLimit;
                 document.getElementById("order_descending").value = orderDescending;
-                console.log("P: " + profitability +", timeWindow: " + timeWindow +", volatilityLimit: " + volatilityLimit);
+                document.getElementById("healthcare_bio").value   = healthcareBiotech;
+
+                console.log("H: " + document.getElementById("healthcare_bio").value + ", P: " + profitability +", timeWindow: " + timeWindow +", volatilityLimit: " + volatilityLimit);
+
+                document.getElementById("main-form").
+                    addEventListener("change", function() {
+                        document.getElementById("main-form").submit();
+                    });
             }
         </script>
     </head>
@@ -23,7 +31,7 @@
             <div id="slogan">
                 <H1 id="main-icon">Sort the stock market!</H1>
             </div>
-            <span id="stash" style="display: none" th:attr="ticker=${ticker},timeWindow=${timeWindow},profitability=${profitability}, volatilityLimit=${volatilityLimit}, orderDescending=${orderDescending}"></span>
+            <span id="stash" style="display: none" th:attr="ticker=${ticker},healthcareBiotech=${healthcareBiotech},timeWindow=${timeWindow},profitability=${profitability}, volatilityLimit=${volatilityLimit}, orderDescending=${orderDescending}"></span>
             <div id="main-center-div">
                     <div th:insert="~{fragments/search-filter.html :: search-filter}"></div>
                     <BR/>
