@@ -8,9 +8,6 @@ import com.midas.helmet.domain.value.EmailAddress
 import com.midas.helmet.services.LoggingService
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.ui.set
@@ -84,9 +81,9 @@ class HomeController(
 
         model["timeWindow"]        = timeWindow
         model["volatilityLimit"]   = volatilityLimit
-        model["profitability"]     = if(profitability) { 1 } else { 0}
-        model["orderDescending"]   = if(orderDescending) { 1 } else { 0}
-        model["healthcareBiotech"] = if(healthcareBiotech) { 1 } else { 0}
+        model["profitability"]     = if (profitability) { 1 } else { 0}
+        model["orderDescending"]   = if (orderDescending) { 1 } else { 0}
+        model["healthcareBiotech"] = if (healthcareBiotech) { 1 } else { 0}
 
         return "index"
     }
@@ -98,16 +95,20 @@ class HomeController(
     ): String {
         loggingService.log("Ticker info requested")
         val stocks            = StockInfo.queryTickerWindows(ticker)
+        val unsupportedTicker = UnsupportedTicker.isNotSupported(ticker)
+
         model["stocks"]       = stocks
-        model["unsupported"]  = if (UnsupportedTicker.isNotSupported(ticker)) { true } else { false }
-        model["notFound"]     = if (stocks.isEmpty()) { true } else { false }
+        model["unsupported"]  = unsupportedTicker
+        model["notFound"]     = (!unsupportedTicker) && stocks.isEmpty()
         model["ticker"]       = ticker
+
+        //loggingService.log("Stocks: " + stocks.size)
 
         if(stocks.isNotEmpty() && stocks[0].name != null) {
             model["name"] = stocks[0].name
         }
 
-        if (stocks.isNotEmpty()) {
+        if (unsupportedTicker && stocks.isNotEmpty()) {
             model["profitMargin"]    = stocks[0].profitMargin
             model["debtRatio"]       = stocks[0].debtRatio
             model["flagBurnRate"]    = stocks[0].flagBurnRate

@@ -4,10 +4,10 @@
         <link rel="stylesheet" href="/app.css">
         <script type="text/javascript">
             function init() {
-                if (document.getElementById("unsupported-container")) {
+                /*if (document.getElementById("unsupported-container")) {
                     alert("Sorry! That stock is currently not providing us with standard US accounting information and is most likely a foreign company. We are working on integrating them. Please shoot us a message on Twitter telling us to hurry up!!!");
                     history.back();
-                }
+                }*/
                 if (document.getElementById("notFound")) {
                     document.getElementById("main-center-div").hidden = true;
                     alert("No stock with that symbol can be found. Type the stock ticker or symbol (not the company name). Check your spelling. Send us a message on Twitter if you are sure you spelt the ticker correctly.");
@@ -31,8 +31,7 @@
                 </div>
 
                 <div>
-                    <div id="unsupported-container" style="display: none;" th:if="${unsupported}"></div>
-                    <th:block th:unless="${unsupported}">
+                    <th:block>
                         <table id="results-table">
                             <thead>
                             <tr id="results-table-header">
@@ -72,6 +71,10 @@
                                 <td th:unless="${cashBurnRate} == -100" th:text="(${cashBurnRate} == null OR ${cashBurnRate} > 0) ? '': ${cashBurnRateMag}" th:style="${flagBurnRate} ?'color: red; font-weight: bolder;' : ''"/>
                             </tr>
                         </table>
+                        <div id="unsupported-container" style="" th:if="${unsupported}">
+                            <p>We are lacking US GAAP financial data for this company.</p>
+                            <p>Please shoot us a message on Twitter telling us to hurry up!!!</p>
+                        </div>
 
                         <th:block th:if="${cashBurnRate} == -100">
                             <BR/>

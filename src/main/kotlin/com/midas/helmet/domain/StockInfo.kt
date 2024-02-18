@@ -25,17 +25,18 @@ class StockInfo {
         constructor()
     }
 
-    var id: StockInfoId? = null
-    var name: String? = null
-    var windowDelta: Double? = null
-    var minDelta: Double? = null
-    var maxDelta: Double? = null
-    var volumeDelta: Double? = null
-    var profitMargin: Double? = null
-    var debtPercentage: Double? = null
-    var cashBurnRate: Double? = null
-    var secSectorCode: Int? = null
-    var otc: Boolean? = null
+    var id: StockInfoId?          = null
+    var name: String?             = null
+    var windowDelta: Double?      = null
+    var minDelta: Double?         = null
+    var maxDelta: Double?         = null
+    var averageDeviation: Double? = null
+    var volumeDelta: Double?      = null
+    var profitMargin: Double?     = null
+    var debtPercentage: Double?   = null
+    var cashBurnRate: Double?     = null
+    var secSectorCode: Int?       = null
+    var otc: Boolean?             = null
 
     class StockInfoDto (
         val ticker: String?,
@@ -43,6 +44,7 @@ class StockInfo {
         val windowDelta: Double?,
         val minDelta: Double?,
         val maxDelta: Double?,
+        val averageDeviation: Double?,
         val volumeDelta: Double?,
         val profitMargin: Double?,
         val debtRatio: Double?,
@@ -62,6 +64,7 @@ class StockInfo {
         windowDelta: Double,
         minDelta: Double,
         maxDelta: Double,
+        averageDeviation: Double,
         volumeDelta: Double,
         profitMargin: Double?,
         debtRatio: Double?,
@@ -70,17 +73,18 @@ class StockInfo {
         secSectorCode: Int?,
         otc: Boolean?
     ) {
-        this.name           = name
-        this.windowDelta    = windowDelta
-        this.minDelta       = minDelta
-        this.maxDelta       = maxDelta
-        this.volumeDelta    = volumeDelta
-        this.profitMargin   = profitMargin
-        this.debtPercentage = debtRatio
-        this.cashBurnRate   = cashBurnRate
-        this.id             = StockInfoId(ticker = ticker, timeWindow = timeWindow)
-        this.secSectorCode  = secSectorCode
-        this.otc            = otc
+        this.name             = name
+        this.windowDelta      = windowDelta
+        this.minDelta         = minDelta
+        this.maxDelta         = maxDelta
+        this.averageDeviation = averageDeviation
+        this.volumeDelta      = volumeDelta
+        this.profitMargin     = profitMargin
+        this.debtPercentage   = debtRatio
+        this.cashBurnRate     = cashBurnRate
+        this.id               = StockInfoId(ticker = ticker, timeWindow = timeWindow)
+        this.secSectorCode    = secSectorCode
+        this.otc              = otc
     }
 
     @Component
@@ -101,7 +105,7 @@ class StockInfo {
                 stocksByTicker[r.id!!.ticker!!.lowercase()] = stockByWindow
 
                 /** Populate the maps for browsing profitable stocks as well as profitable + unprofitable **/
-                if((r.profitMargin != null) && r.profitMargin!! > 0) {
+                if ((r.profitMargin != null) && r.profitMargin!! > 0) {
                     profitableStocksOnly.add(r)
                 }
                 allStocks.add(r)
@@ -170,7 +174,7 @@ class StockInfo {
                 (
                         it.secSectorCode == null ||
                         (
-                            (healthcareBiotech || ((it.secSectorCode != 283) && (!("$it.secSectorCode".startsWith("38"))) && (!("$it.secSectorCode".startsWith("80"))))) &&
+                            invert(toggle = !healthcareBiotech, input = (it.secSectorCode == 283) || ("$it.secSectorCode".startsWith("38")) || ("$it.secSectorCode".startsWith("80"))) &&
 
                             (it.otc == false)
                         )
@@ -181,6 +185,10 @@ class StockInfo {
                 return results.sortedByDescending { it.windowDelta }
             }
             return results.sortedBy { it.windowDelta }
+        }
+
+        private fun invert(toggle: Boolean, input: Boolean) : Boolean {
+            return if (toggle) { !input } else { input }
         }
 
         private fun query(
@@ -209,20 +217,21 @@ class StockInfo {
             //Todo: The DTOafication of the domain data needs to be abstracted because its utilized in two methods
             return results.subList(start, endIndex).map { x ->
                 StockInfoDto(
-                    ticker          = x.id!!.ticker,
-                    name            = x.name,
-                    windowDelta     = x.windowDelta,
-                    minDelta        = x.minDelta,
-                    maxDelta        = x.maxDelta,
-                    volumeDelta     = x.volumeDelta,
-                    profitMargin    = x.profitMargin,
-                    debtRatio       = x.debtPercentage,
-                    flagDebtRatio   = x.debtPercentage != null && x.debtPercentage!! > 50.0,
-                    cashBurnRate    = x.cashBurnRate,
-                    cashBurnRateMag = if( x.cashBurnRate != null && x.cashBurnRate!! <0) { abs(x.cashBurnRate!!) } else { null },
-                    showBurnRate    = x.cashBurnRate != null && x.cashBurnRate!! < 0,
-                    flagBurnRate    = x.cashBurnRate != null && x.cashBurnRate!! <= -100,
-                    timeWindow      = timeWindow
+                    ticker           = x.id!!.ticker,
+                    name             = x.name,
+                    windowDelta      = x.windowDelta,
+                    minDelta         = x.minDelta,
+                    maxDelta         = x.maxDelta,
+                    averageDeviation = x.averageDeviation,
+                    volumeDelta      = x.volumeDelta,
+                    profitMargin     = x.profitMargin,
+                    debtRatio        = x.debtPercentage,
+                    flagDebtRatio    = x.debtPercentage != null && x.debtPercentage!! > 50.0,
+                    cashBurnRate     = x.cashBurnRate,
+                    cashBurnRateMag  = if( x.cashBurnRate != null && x.cashBurnRate!! <0) { abs(x.cashBurnRate!!) } else { null },
+                    showBurnRate     = x.cashBurnRate != null && x.cashBurnRate!! < 0,
+                    flagBurnRate     = x.cashBurnRate != null && x.cashBurnRate!! <= -100,
+                    timeWindow       = timeWindow
                )
             }
         }
@@ -245,20 +254,21 @@ class StockInfo {
 
              resultList.add(
                 StockInfoDto(
-                    ticker          = x.id!!.ticker,
-                    name            = x.name,
-                    windowDelta     = x.windowDelta,
-                    minDelta        = x.minDelta,
-                    maxDelta        = x.maxDelta,
-                    volumeDelta     = x.volumeDelta,
-                    profitMargin    = x.profitMargin,
-                    debtRatio       = x.debtPercentage,
-                    flagDebtRatio   = x.debtPercentage != null && x.debtPercentage!! > 50.0,
-                    cashBurnRate    = x.cashBurnRate,
-                    cashBurnRateMag = if( x.cashBurnRate != null && x.cashBurnRate!! <0) { abs(x.cashBurnRate!!) } else { null },
-                    showBurnRate    = x.cashBurnRate != null && x.cashBurnRate!! < 0,
-                    flagBurnRate    = x.cashBurnRate != null && x.cashBurnRate!! <= -100,
-                    timeWindow      = timeWindow
+                    ticker           = x.id!!.ticker,
+                    name             = x.name,
+                    windowDelta      = x.windowDelta,
+                    minDelta         = x.minDelta,
+                    maxDelta         = x.maxDelta,
+                    averageDeviation = x.averageDeviation,
+                    volumeDelta      = x.volumeDelta,
+                    profitMargin     = x.profitMargin,
+                    debtRatio        = x.debtPercentage,
+                    flagDebtRatio    = x.debtPercentage != null && x.debtPercentage!! > 50.0,
+                    cashBurnRate     = x.cashBurnRate,
+                    cashBurnRateMag  = if( x.cashBurnRate != null && x.cashBurnRate!! <0) { abs(x.cashBurnRate!!) } else { null },
+                    showBurnRate     = x.cashBurnRate != null && x.cashBurnRate!! < 0,
+                    flagBurnRate     = x.cashBurnRate != null && x.cashBurnRate!! <= -100,
+                    timeWindow       = timeWindow
                 )
             )
             return resultList
