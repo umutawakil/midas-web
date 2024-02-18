@@ -68,6 +68,7 @@
                             <HR class="mobile-rule"/>
                             <div th:each="s: ${stocks}" style="text-align: center; display: inline-block;" class="results-table-mobile">
                                 <div><a th:href="${'/ticker/' + s.ticker}" th:text="${s.ticker}"></a></div>
+                                <div th:if="${s.name != null}" th:text="${s.name}"></div>
                                 <div>Total Gain: <span th:text="${s.windowDelta}" /><span>%</span></div>
                                 <div>Worst Day: <span th:text="${s.minDelta}" /><span>%</span></div>
                                 <div>Best Day: <span th:text="${s.maxDelta}" /><span>%</span></div>

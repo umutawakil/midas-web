@@ -108,7 +108,7 @@ class HomeController(
             model["name"] = stocks[0].name
         }
 
-        if (unsupportedTicker && stocks.isNotEmpty()) {
+        if (!unsupportedTicker && stocks.isNotEmpty()) {
             model["profitMargin"]    = stocks[0].profitMargin
             model["debtRatio"]       = stocks[0].debtRatio
             model["flagBurnRate"]    = stocks[0].flagBurnRate
