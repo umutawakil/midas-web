@@ -7,13 +7,7 @@ set -e
 environment=$1
 localProjectFolder=$2
 viewVersion=$3
-
 deploymentBucket="bloip-deployment-${environment}"
-preDeploymentBucket="bloip-pre-deployment-${environment}"
-
-#Move static secrets and environment config files to deployment bucket. The preDeploymentBucket is populated manually.
-# And its contents are not meant to change across deployments, such as password files and configurations not under source control.
-aws s3 cp s3://${preDeploymentBucket} s3://${deploymentBucket} --recursive
 
 #build application
 ${localProjectFolder}/gradlew clean
