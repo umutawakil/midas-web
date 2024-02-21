@@ -99,6 +99,7 @@
                             <input type="hidden" name="volatility_limit" th:value="${volatilityLimit}">
                             <input type="hidden" name="profitability" th:value="${profitability}">
                             <input type="hidden" name="order_descending" th:value="${orderDescending}">
+                            <input type="hidden" name="healthcare_bio" th:value="${healthcareBiotech}">
                             <button> < </button>
                         </form>
                         <form th:if="${next != null}" action="/" method = "GET" style="display: inline-block;">
@@ -107,6 +108,7 @@
                             <input type="hidden" name="volatility_limit" th:value="${volatilityLimit}">
                             <input type="hidden" name="profitability" th:value="${profitability}">
                             <input type="hidden" name="order_descending" th:value="${orderDescending}">
+                            <input type="hidden" name="healthcare_bio" th:value="${healthcareBiotech}">
                             <button> > </button>
                         </form>
                     </div>

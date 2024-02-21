@@ -36,6 +36,7 @@ class StockInfo {
     var debtPercentage: Double?   = null
     var cashBurnRate: Double?     = null
     var secSectorCode: Int?       = null
+    var sicCode: Int?             = null
     var otc: Boolean?             = null
 
     class StockInfoDto (
@@ -71,6 +72,7 @@ class StockInfo {
         cashBurnRate: Double?,
         timeWindow: Int,
         secSectorCode: Int?,
+        sicCode: Int?,
         otc: Boolean?
     ) {
         this.name             = name
@@ -84,6 +86,7 @@ class StockInfo {
         this.cashBurnRate     = cashBurnRate
         this.id               = StockInfoId(ticker = ticker, timeWindow = timeWindow)
         this.secSectorCode    = secSectorCode
+        this.sicCode          = sicCode
         this.otc              = otc
     }
 
@@ -174,7 +177,7 @@ class StockInfo {
                 (
                         it.secSectorCode == null ||
                         (
-                            invert(toggle = !healthcareBiotech, input = (it.secSectorCode == 283) || ("$it.secSectorCode".startsWith("38")) || ("$it.secSectorCode".startsWith("80"))) &&
+                            invert(toggle = !healthcareBiotech, input = ((it.secSectorCode == 283) || (it.sicCode == 8731) || "$it.secSectorCode".startsWith("38") || "$it.secSectorCode".startsWith("80"))) &&
 
                             (it.otc == false)
                         )
