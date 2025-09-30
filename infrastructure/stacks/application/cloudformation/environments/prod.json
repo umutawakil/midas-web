@@ -13,7 +13,7 @@
   },
   {
     "ParameterKey": "SSLCertificateARN",
-    "ParameterValue": "arn:aws:acm:us-east-1:298959928212:certificate/e2595282-7e04-42c1-8cbd-aab95e2c30b2"
+    "ParameterValue": ""
   },
   {
     "ParameterKey": "HostedZone",
@@ -21,11 +21,11 @@
   },
   {
     "ParameterKey": "HostedZoneId",
-    "ParameterValue": "Z21N42AJ30TOFR"
+    "ParameterValue": ""
   },
   {
     "ParameterKey": "CloudFrontZoneId",
-    "ParameterValue": "Z2FDTNDATAQYW2"
+    "ParameterValue": ""
   },
   {
     "ParameterKey": "InstanceType",
@@ -33,7 +33,7 @@
   },
   {
     "ParameterKey": "AMI",
-    "ParameterValue": "ami-0bb5bdcde45e9ca22"
+    "ParameterValue": ""
   },
   {
     "ParameterKey": "NumberOfEC2Instances",
@@ -48,7 +48,7 @@
   },
   {
     "ParameterKey": "NotificationEmail",
-    "ParameterValue": "usman.mutawakil@gmail.com"
+    "ParameterValue": ""
   },
   {
     "ParameterKey": "ProxyCacheTimeSecs",
