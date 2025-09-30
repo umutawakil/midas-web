@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 import java.net.URLEncoder
 import java.util.*
 
-/* TODO: There may be duplication between the DynomDB infrastructure templates linked to this **/
+/* TODO: There may be duplication between the DynomDB infrastructure templates linked to this */
 
 class Subscriber {
     @Component
